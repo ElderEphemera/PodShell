@@ -1,6 +1,8 @@
 package com.elderephemera.podshell.ui
 
 import androidx.compose.runtime.Composable
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 interface AppTab {
     val title : String
@@ -8,6 +10,8 @@ interface AppTab {
     @Composable
     fun FabIcon()
     fun fabOnClick()
+
+    fun listItems(): Flow<List<String>> = flowOf(listOf())
 
     @Composable
     fun AdditionalContent() {}

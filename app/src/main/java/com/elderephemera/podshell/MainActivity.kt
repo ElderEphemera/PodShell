@@ -8,6 +8,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -21,14 +22,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.elderephemera.podshell.data.AppDataContainer
+import com.elderephemera.podshell.data.Feed
+import com.elderephemera.podshell.data.FeedDao
 import com.elderephemera.podshell.ui.AppTab
 import com.elderephemera.podshell.ui.theme.PodShellTheme
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val appContainer = AppDataContainer(applicationContext)
         setContent {
             PodShellTheme {
                 // A surface container using the 'background' color from the theme
@@ -37,7 +43,11 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     val pagerState = rememberPagerState(0)
-                    val tabs = listOf(playlistTab(), newEpisodesTab(), subscriptionsTab())
+                    val tabs = listOf(
+                        playlistTab(),
+                        newEpisodesTab(),
+                        subscriptionsTab(appContainer.feedDao),
+                    )
                     val animationScope = rememberCoroutineScope()
                     Scaffold(
                         topBar = {
@@ -81,7 +91,7 @@ fun newEpisodesTab() = object : AppTab {
 }
 
 @Composable
-fun subscriptionsTab() = object : AppTab {
+fun subscriptionsTab(feedDao: FeedDao) = object : AppTab {
     override val title = "SUBSCRIPTIONS"
 
     private var showDialog by remember { mutableStateOf(false) }
@@ -90,6 +100,8 @@ fun subscriptionsTab() = object : AppTab {
     override fun FabIcon() =
         Icon(Icons.Filled.Add, contentDescription = "Add podcast feed")
     override fun fabOnClick() { showDialog = true }
+
+    override fun listItems() = feedDao.getAll().map { it.map(Feed::url) }
 
     @Composable
     override fun AdditionalContent() = AnimatedVisibility(visible = showDialog) {
@@ -102,10 +114,12 @@ fun subscriptionsTab() = object : AppTab {
                     .padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
+                val dataScope = rememberCoroutineScope()
+                var feedUrl by remember { mutableStateOf("") }
                 Text(text = "Add Subscription", fontSize = 20.sp)
                 TextField(
-                    value = "",
-                    onValueChange = {},
+                    value = feedUrl,
+                    onValueChange = { feedUrl = it },
                     placeholder = { Text(text = "Paste feed URL here") },
                 )
                 Box(
@@ -113,7 +127,12 @@ fun subscriptionsTab() = object : AppTab {
                     contentAlignment = Alignment.CenterEnd,
                 ) {
                     TextButton(
-                        onClick = {},
+                        onClick = {
+                            dataScope.launch {
+                                feedDao.insert(Feed(url = feedUrl))
+                                showDialog = false
+                            }
+                        },
                     ) {
                         Text(text = "SUBSCRIBE")
                     }
@@ -158,12 +177,15 @@ fun Pages(tabs: List<AppTab>, pagerState: PagerState) {
             },
         ) { padding ->
             tab.AdditionalContent()
+            val listItems by tab.listItems().collectAsState(listOf())
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
             ) {
-
+                items(listItems) {
+                    Text(it)
+                }
             }
         }
     }
