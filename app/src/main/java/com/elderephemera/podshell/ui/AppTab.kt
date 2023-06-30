@@ -11,7 +11,7 @@ interface AppTab {
     fun FabIcon()
     fun fabOnClick()
 
-    fun listItems(): Flow<List<String>> = flowOf(listOf())
+    fun listItems(): Flow<List<ListItemCard>> = flowOf(listOf())
 
     @Composable
     fun AdditionalContent() {}

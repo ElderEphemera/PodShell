@@ -26,6 +26,7 @@ import com.elderephemera.podshell.data.AppDataContainer
 import com.elderephemera.podshell.data.Feed
 import com.elderephemera.podshell.data.FeedDao
 import com.elderephemera.podshell.ui.AppTab
+import com.elderephemera.podshell.ui.ListItemCard
 import com.elderephemera.podshell.ui.theme.PodShellTheme
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -90,18 +91,31 @@ fun newEpisodesTab() = object : AppTab {
     override fun fabOnClick() {}
 }
 
-@Composable
 fun subscriptionsTab(feedDao: FeedDao) = object : AppTab {
     override val title = "SUBSCRIPTIONS"
 
-    private var showDialog by remember { mutableStateOf(false) }
+    private var showDialog by mutableStateOf(false)
 
     @Composable
     override fun FabIcon() =
         Icon(Icons.Filled.Add, contentDescription = "Add podcast feed")
     override fun fabOnClick() { showDialog = true }
 
-    override fun listItems() = feedDao.getAll().map { it.map(Feed::url) }
+    override fun listItems() = feedDao.getAll().map { it.map { feed ->
+        object : ListItemCard {
+            @Composable
+            override fun Logo() {}
+
+            override val title = feed.url
+            override val url = ""
+            override val subtitle = ""
+            override val description = ""
+
+            @Composable
+            override fun ActionButton() {}
+
+        }
+    }}
 
     @Composable
     override fun AdditionalContent() = AnimatedVisibility(visible = showDialog) {
@@ -184,7 +198,7 @@ fun Pages(tabs: List<AppTab>, pagerState: PagerState) {
                     .padding(padding)
             ) {
                 items(listItems) {
-                    Text(it)
+                    Text(it.title)
                 }
             }
         }
