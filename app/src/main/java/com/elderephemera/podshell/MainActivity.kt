@@ -3,7 +3,6 @@ package com.elderephemera.podshell
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,22 +12,14 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import com.elderephemera.podshell.data.AppDataContainer
-import com.elderephemera.podshell.data.Feed
-import com.elderephemera.podshell.data.FeedDao
 import com.elderephemera.podshell.ui.AppTab
-import com.elderephemera.podshell.ui.ListItemCard
+import com.elderephemera.podshell.ui.NewEpisodesTab
+import com.elderephemera.podshell.ui.PlaylistTab
+import com.elderephemera.podshell.ui.SubscriptionsTab
 import com.elderephemera.podshell.ui.theme.PodShellTheme
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -45,9 +36,9 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val pagerState = rememberPagerState(0)
                     val tabs = listOf(
-                        playlistTab(),
-                        newEpisodesTab(),
-                        subscriptionsTab(appContainer.feedDao),
+                        PlaylistTab(),
+                        NewEpisodesTab(),
+                        SubscriptionsTab(appContainer.feedDao),
                     )
                     val animationScope = rememberCoroutineScope()
                     Scaffold(
@@ -64,91 +55,6 @@ class MainActivity : ComponentActivity() {
                             .padding(padding)) {
                             Pages(tabs, pagerState)
                         }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun playlistTab() = object : AppTab {
-    override val title = "PLAYLIST"
-
-    @Composable
-    override fun FabIcon() =
-        Icon(Icons.Filled.Star, contentDescription = "")
-    override fun fabOnClick() {}
-}
-
-@Composable
-fun newEpisodesTab() = object : AppTab {
-    override val title = "NEW EPISODES"
-
-    @Composable
-    override fun FabIcon() =
-        Icon(Icons.Filled.Star, contentDescription = "")
-    override fun fabOnClick() {}
-}
-
-fun subscriptionsTab(feedDao: FeedDao) = object : AppTab {
-    override val title = "SUBSCRIPTIONS"
-
-    private var showDialog by mutableStateOf(false)
-
-    @Composable
-    override fun FabIcon() =
-        Icon(Icons.Filled.Add, contentDescription = "Add podcast feed")
-    override fun fabOnClick() { showDialog = true }
-
-    override fun listItems() = feedDao.getAll().map { it.map { feed ->
-        object : ListItemCard {
-            @Composable
-            override fun Logo() {}
-
-            override val title = feed.url
-            override val url = ""
-            override val subtitle = ""
-            override val description = ""
-
-            @Composable
-            override fun ActionButton() {}
-
-        }
-    }}
-
-    @Composable
-    override fun AdditionalContent() = AnimatedVisibility(visible = showDialog) {
-        Dialog(
-            onDismissRequest = { showDialog = false },
-        ) {
-            Column(
-                modifier = Modifier
-                    .background(MaterialTheme.colors.background)
-                    .padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                val dataScope = rememberCoroutineScope()
-                var feedUrl by remember { mutableStateOf("") }
-                Text(text = "Add Subscription", fontSize = 20.sp)
-                TextField(
-                    value = feedUrl,
-                    onValueChange = { feedUrl = it },
-                    placeholder = { Text(text = "Paste feed URL here") },
-                )
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.CenterEnd,
-                ) {
-                    TextButton(
-                        onClick = {
-                            dataScope.launch {
-                                feedDao.insert(Feed(url = feedUrl))
-                                showDialog = false
-                            }
-                        },
-                    ) {
-                        Text(text = "SUBSCRIBE")
                     }
                 }
             }
