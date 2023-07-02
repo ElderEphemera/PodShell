@@ -45,7 +45,7 @@ class SubscriptionsTab(private val feedDao: FeedDao) : AppTab {
         }}
 
     @Composable
-    override fun AdditionalContent() = AnimatedVisibility(visible = showDialog) {
+    private fun AddFeedDialog() = AnimatedVisibility(visible = showDialog) {
         Dialog(
             onDismissRequest = { showDialog = false },
         ) {
@@ -80,5 +80,11 @@ class SubscriptionsTab(private val feedDao: FeedDao) : AppTab {
                 }
             }
         }
+    }
+
+    @Composable
+    override fun Content() {
+        AddFeedDialog()
+        super.Content()
     }
 }

@@ -6,8 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -84,29 +82,5 @@ fun Pages(tabs: List<AppTab>, pagerState: PagerState) {
         pageCount = 3,
         state = pagerState,
         modifier = Modifier.fillMaxSize(),
-    ) { index ->
-        val tab = tabs[index]
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = tab::fabOnClick,
-                    backgroundColor = MaterialTheme.colors.primary,
-                    content = { tab.FabIcon() },
-                )
-            },
-        ) { padding ->
-            tab.AdditionalContent()
-            val listItems by tab.listItems().collectAsState(listOf())
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-            ) {
-                items(listItems) {
-                    Text(it.title)
-                }
-            }
-        }
-    }
+    ) { tabs[it].Content() }
 }
