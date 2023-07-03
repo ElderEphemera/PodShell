@@ -12,6 +12,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.elderephemera.podshell.data.AppDataContainer
 import com.elderephemera.podshell.ui.AppTab
 import com.elderephemera.podshell.ui.NewEpisodesTab
@@ -36,7 +37,7 @@ class MainActivity : ComponentActivity() {
                     val tabs = listOf(
                         PlaylistTab(),
                         NewEpisodesTab(),
-                        SubscriptionsTab(appContainer.feedsRepository),
+                        SubscriptionsTab(LocalContext.current, appContainer.feedsRepository),
                     )
                     val animationScope = rememberCoroutineScope()
                     Scaffold(
