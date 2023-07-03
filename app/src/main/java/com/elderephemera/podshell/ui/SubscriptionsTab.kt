@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.List
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,7 +41,9 @@ class SubscriptionsTab(private val feedsRepository: FeedsRepository) : AppTab {
                 override val description = ""
 
                 @Composable
-                override fun ActionButton() {}
+                override fun ActionButton() = IconButton(onClick = {}) {
+                    Icon(Icons.Filled.List, contentDescription = "Show feed episodes")
+                }
             }
         }}
 
