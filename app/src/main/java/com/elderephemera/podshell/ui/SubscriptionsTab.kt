@@ -13,12 +13,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.elderephemera.podshell.data.Feed
-import com.elderephemera.podshell.data.FeedDao
+import com.elderephemera.podshell.data.FeedsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class SubscriptionsTab(private val feedDao: FeedDao) : AppTab {
+class SubscriptionsTab(private val feedsRepository: FeedsRepository) : AppTab {
     override val title = "SUBSCRIPTIONS"
 
     private var showDialog by mutableStateOf(false)
@@ -29,7 +29,7 @@ class SubscriptionsTab(private val feedDao: FeedDao) : AppTab {
     override fun fabOnClick() { showDialog = true }
 
     override fun listItems(): Flow<List<ListItemCard>> =
-        feedDao.getAll().map { it.map { feed ->
+        feedsRepository.getAllFeeds().map { it.map { feed ->
             object : ListItemCard {
                 @Composable
                 override fun Logo() {}
@@ -70,7 +70,7 @@ class SubscriptionsTab(private val feedDao: FeedDao) : AppTab {
                     TextButton(
                         onClick = {
                             dataScope.launch {
-                                feedDao.insert(Feed(url = feedUrl))
+                                feedsRepository.insertFeed(Feed(url = feedUrl))
                                 showDialog = false
                             }
                         },

@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
                     val tabs = listOf(
                         PlaylistTab(),
                         NewEpisodesTab(),
-                        SubscriptionsTab(appContainer.feedDao),
+                        SubscriptionsTab(appContainer.feedsRepository),
                     )
                     val animationScope = rememberCoroutineScope()
                     Scaffold(

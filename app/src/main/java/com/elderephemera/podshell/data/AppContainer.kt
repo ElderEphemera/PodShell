@@ -3,11 +3,11 @@ package com.elderephemera.podshell.data
 import android.content.Context
 
 interface AppContainer {
-    val feedDao: FeedDao
+    val feedsRepository: FeedsRepository
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
-    override val feedDao: FeedDao by lazy {
-        PodDatabase.getDatabase(context).feedDao()
+    override val feedsRepository by lazy {
+        OfflineFeedsRepository(PodDatabase.getDatabase(context).feedDao())
     }
 }
