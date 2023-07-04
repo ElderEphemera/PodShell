@@ -6,4 +6,5 @@ class OfflineEpisodesRepository(private val episodeDao: EpisodeDao) : EpisodesRe
     override suspend fun insertEpisode(episode: Episode) = episodeDao.insert(episode)
     override fun getAllFeedEpisodes(feed: Feed): Flow<List<Episode>> =
         episodeDao.getAllFromFeed(feed.id)
+    override fun getAllFeedsInPlaylist(): Flow<List<Episode>> = episodeDao.getAllInPlaylist()
 }

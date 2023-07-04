@@ -20,4 +20,6 @@ data class Episode(
     val id: Int = 0,
     val guid: String,
     val feedId: Int,
+    val inPlaylist: Boolean = false,
+    val position: Long? = null,
 )
