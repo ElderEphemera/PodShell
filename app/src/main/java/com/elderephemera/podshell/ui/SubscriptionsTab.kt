@@ -7,15 +7,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.List
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import coil.compose.AsyncImage
 import com.elderephemera.podshell.data.Feed
 import com.elderephemera.podshell.data.FeedsRepository
 import kotlinx.coroutines.flow.Flow
@@ -36,26 +33,7 @@ class SubscriptionsTab(
     override fun fabOnClick() { showDialog = true }
 
     override fun listItems(): Flow<List<ListItemCard>> =
-        feedsRepository.getAllFeedInfo(context).map { it.map { feed ->
-            object : ListItemCard {
-                @Composable
-                override fun Logo() = AsyncImage(
-                    model = feed.logo,
-                    contentDescription = feed.title,
-                    contentScale = ContentScale.FillWidth,
-                )
-
-                override val title = feed.title
-                override val url = feed.url
-                override val subtitle = feed.numEpisodes.toString() + " Episodes"
-                override val description = feed.description
-
-                @Composable
-                override fun ActionButton() = IconButton(onClick = {}) {
-                    Icon(Icons.Filled.List, contentDescription = "Show feed episodes")
-                }
-            }
-        }}
+        feedsRepository.getAllFeedInfo(context).map { it.map(::FeedListItemCard) }
 
     @Composable
     private fun AddFeedDialog() = AnimatedVisibility(visible = showDialog) {
