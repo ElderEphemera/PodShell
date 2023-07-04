@@ -6,12 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [Feed::class],
+    entities = [Feed::class, Episode::class],
     version = 1,
     exportSchema = false,
 )
 abstract class PodDatabase : RoomDatabase() {
     abstract fun feedDao(): FeedDao
+    abstract fun episodesDao(): EpisodeDao
 
     companion object {
         @Volatile
