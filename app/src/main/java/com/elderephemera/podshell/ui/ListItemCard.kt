@@ -1,8 +1,12 @@
 package com.elderephemera.podshell.ui
 
+import android.text.TextUtils
+import android.widget.TextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -10,11 +14,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.text.HtmlCompat
 
 interface ListItemCard {
     @Composable
@@ -46,9 +53,7 @@ interface ListItemCard {
                 ) {
                     Box(
                         contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .width(75.dp)
-                            .fillMaxHeight()
+                        modifier = Modifier.fillMaxHeight()
                     ) {
                         Logo()
                     }
@@ -94,12 +99,37 @@ interface ListItemCard {
                 }
             }
             Divider(color = MaterialTheme.colors.background)
-            Text(
+            /*Text(
                 text = description,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = if (expanded) Int.MAX_VALUE else 1,
                 modifier = Modifier.padding(5.dp)
+            )*/
+            val onSurface = MaterialTheme.colors.onSurface.toArgb()
+            AndroidView(
+                factory = { context ->
+                    TextView(context).apply {
+                        text = HtmlCompat.fromHtml(description, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                        ellipsize = TextUtils.TruncateAt.END
+                        maxLines = if (expanded) Int.MAX_VALUE else 1
+                        setTextColor(onSurface)
+                    }
+                },
+                update = { it.maxLines = if (expanded) Int.MAX_VALUE else 1 },
+                modifier = Modifier.padding(5.dp)
             )
         }
+    }
+}
+
+@Composable
+fun List<ListItemCard>.ItemCardList() = LazyColumn(
+    verticalArrangement = Arrangement.spacedBy(10.dp),
+    modifier = Modifier
+        .fillMaxSize()
+        .padding(10.dp)
+) {
+    items(this@ItemCardList) {
+        it.Content()
     }
 }
