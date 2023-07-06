@@ -110,7 +110,7 @@ class SubscriptionsTab(
                         .padding(10.dp)
                 )
                 val episodes by listDialogEpisodes.collectAsState(listOf())
-                episodes.map { EpisodeListItemCard(it, showLogo = false) }.ItemCardList()
+                episodes.map { EpisodeListItemCard(it, episodesRepository) }.ItemCardList()
             }
         }
     }
