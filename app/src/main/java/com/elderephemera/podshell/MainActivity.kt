@@ -12,7 +12,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import com.elderephemera.podshell.data.AppDataContainer
 import com.elderephemera.podshell.ui.AppTab
 import com.elderephemera.podshell.ui.NewEpisodesTab
@@ -28,7 +27,6 @@ class MainActivity : ComponentActivity() {
         val appContainer = AppDataContainer(applicationContext)
         setContent {
             PodShellTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
@@ -37,7 +35,10 @@ class MainActivity : ComponentActivity() {
                     val tabs = listOf(
                         PlaylistTab(),
                         NewEpisodesTab(),
-                        SubscriptionsTab(LocalContext.current, appContainer.feedsRepository),
+                        SubscriptionsTab(
+                            appContainer.feedsRepository,
+                            appContainer.episodesRepository,
+                        ),
                     )
                     val animationScope = rememberCoroutineScope()
                     Scaffold(

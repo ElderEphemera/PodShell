@@ -9,7 +9,7 @@ interface AppContainer {
 
 class AppDataContainer(private val context: Context) : AppContainer {
     override val feedsRepository by lazy {
-        OfflineFeedsRepository(PodDatabase.getDatabase(context).feedDao())
+        OfflineFeedsRepository(PodDatabase.getDatabase(context).feedDao(), episodesRepository)
     }
 
     override val episodesRepository by lazy {

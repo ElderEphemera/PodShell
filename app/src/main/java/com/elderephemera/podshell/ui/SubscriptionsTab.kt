@@ -1,6 +1,5 @@
 package com.elderephemera.podshell.ui
 
-import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,16 +14,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.elderephemera.podshell.data.Episode
+import com.elderephemera.podshell.data.EpisodesRepository
 import com.elderephemera.podshell.data.Feed
-import com.elderephemera.podshell.data.FeedInfo
 import com.elderephemera.podshell.data.FeedsRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class SubscriptionsTab(
-    private val context: Context,
     private val feedsRepository: FeedsRepository,
+    private val episodesRepository: EpisodesRepository,
 ) : AppTab {
     override val title = "SUBSCRIPTIONS"
 
@@ -34,10 +35,11 @@ class SubscriptionsTab(
     override fun fabOnClick() { showAddFeedDialog = true }
 
     override fun listItems(): Flow<List<ListItemCard>> =
-        feedsRepository.getAllFeedInfo(context).map {
+        feedsRepository.getAllFeeds().map {
             it.map { feed ->
                 FeedListItemCard(feed) {
                     listDialogFeed = feed
+                    listDialogEpisodes = episodesRepository.getAllFeedEpisodes(feed)
                     showListDialog = true
                 }
             }
@@ -70,7 +72,8 @@ class SubscriptionsTab(
                     TextButton(
                         onClick = {
                             dataScope.launch {
-                                feedsRepository.insertFeed(Feed(url = feedUrl))
+                                val feedId = feedsRepository.insertFeed(feedUrl)
+                                feedsRepository.updateFeed(feedId, feedUrl)
                                 showAddFeedDialog = false
                             }
                         },
@@ -82,7 +85,8 @@ class SubscriptionsTab(
         }
     }
 
-    private var listDialogFeed: FeedInfo? by mutableStateOf(null)
+    private var listDialogFeed: Feed? by mutableStateOf(null)
+    private var listDialogEpisodes: Flow<List<Episode>> by mutableStateOf(flowOf(listOf()))
     private var showListDialog by mutableStateOf(false)
     @Composable
     private fun ListDialog() = AnimatedVisibility(visible = showListDialog) {
@@ -105,7 +109,8 @@ class SubscriptionsTab(
                         .fillMaxWidth()
                         .padding(10.dp)
                 )
-                listDialogFeed?.episodes?.map(::EpisodeListItemCard)?.ItemCardList()
+                val episodes by listDialogEpisodes.collectAsState(listOf())
+                episodes.map(::EpisodeListItemCard).ItemCardList()
             }
         }
     }

@@ -5,10 +5,10 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
-import com.elderephemera.podshell.data.EpisodeInfo
+import com.elderephemera.podshell.data.Episode
 
 class EpisodeListItemCard(
-    episode: EpisodeInfo,
+    episode: Episode,
 ) : ListItemCard {
     @Composable
     override fun Logo() {}

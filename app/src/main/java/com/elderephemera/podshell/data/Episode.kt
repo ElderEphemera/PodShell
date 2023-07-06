@@ -17,9 +17,13 @@ import androidx.room.PrimaryKey
 )
 data class Episode(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     val guid: String,
-    val feedId: Int,
+    val feedId: Long,
     val inPlaylist: Boolean = false,
     val position: Long? = null,
+    val title: String,
+    val url: String,
+    val pubDate: String,
+    val description: String,
 )

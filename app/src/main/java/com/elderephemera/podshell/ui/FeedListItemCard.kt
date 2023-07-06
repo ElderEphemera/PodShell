@@ -10,10 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.elderephemera.podshell.data.FeedInfo
+import com.elderephemera.podshell.data.Feed
 
 class FeedListItemCard(
-    private val feed: FeedInfo,
+    private val feed: Feed,
     private val openList: () -> Unit
 ) : ListItemCard {
     @Composable
@@ -26,7 +26,7 @@ class FeedListItemCard(
 
     override val title = feed.title
     override val url = feed.url
-    override val subtitle = feed.episodes.size.toString() + " Episodes"
+    override val subtitle = "TODO"
     override val description = feed.description
 
     @Composable
