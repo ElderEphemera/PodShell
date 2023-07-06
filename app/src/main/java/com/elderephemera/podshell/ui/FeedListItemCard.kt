@@ -11,6 +11,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.elderephemera.podshell.data.Feed
+import java.time.Instant
+import kotlin.time.Duration.Companion.seconds
 
 class FeedListItemCard(
     private val feed: Feed,
@@ -26,7 +28,16 @@ class FeedListItemCard(
 
     override val title = feed.title
     override val url = feed.url
-    override val subtitle = "TODO"
+    override val subtitle = (Instant.now().epochSecond - feed.refreshed).seconds.toComponents {
+        days, hours, minutes, _, _ ->
+        if (days == 1L) "Refreshed 1 day ago"
+        else if (days != 0L) "Refreshed $days days ago"
+        else if (hours == 1) "Refreshed 1 hour ago"
+        else if (hours != 0) "Refreshed $hours hours ago"
+        else if (minutes == 1) "Refreshed 1 minute ago"
+        else if (minutes != 0) "Refreshed $minutes minutes ago"
+        else "Refreshed just now"
+    }
     override val description = feed.description
 
     @Composable

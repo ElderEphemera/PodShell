@@ -2,6 +2,7 @@ package com.elderephemera.podshell.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.time.Instant
 
 @Entity(tableName = "feeds")
 data class Feed(
@@ -11,4 +12,5 @@ data class Feed(
     val title: String,
     val url: String,
     val description: String,
+    val refreshed: Long = Instant.now().epochSecond,
 )
