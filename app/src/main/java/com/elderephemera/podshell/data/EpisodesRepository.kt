@@ -6,5 +6,5 @@ interface EpisodesRepository {
     suspend fun insertEpisode(episode: Episode)
     suspend fun updateEpisode(episode: Episode)
     fun getAllFeedEpisodes(feed: Feed): Flow<List<Episode>>
-    fun getAllFeedsInPlaylist(): Flow<List<Episode>>
+    fun getAllEpisodesInPlaylist(): Flow<List<Episode>>
 }
