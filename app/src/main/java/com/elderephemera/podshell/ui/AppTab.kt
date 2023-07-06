@@ -11,7 +11,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 
 interface AppTab {
     val title : String
@@ -20,7 +19,7 @@ interface AppTab {
     fun FabIcon()
     fun fabOnClick()
 
-    fun listItems(): Flow<List<ListItemCard>> = flowOf(listOf())
+    fun listItems(): Flow<List<ListItemCard>>
 
     @Composable
     fun Content() = Scaffold(

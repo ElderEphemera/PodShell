@@ -22,6 +22,7 @@ data class Episode(
     val feedId: Long,
     val inPlaylist: Boolean = false,
     val position: Long? = null,
+    val logo: String?,
     val title: String,
     val url: String,
     val pubDate: String,

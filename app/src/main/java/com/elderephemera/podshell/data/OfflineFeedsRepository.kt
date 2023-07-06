@@ -13,6 +13,9 @@ class OfflineFeedsRepository(
         url = url,
         description = "",
     ))
+
+    override suspend fun getFeed(id: Long) = feedDao.get(id)
+
     override fun getAllFeeds() = feedDao.getAll()
 
     private val parser = Parser.Builder().build()
@@ -32,6 +35,7 @@ class OfflineFeedsRepository(
             val new = Episode(
                 guid = article.guid ?: article.hashCode().toString(),
                 feedId = id,
+                logo = article.image,
                 title = article.title ?: "",
                 url = article.link ?: url,
                 pubDate = article.pubDate ?: "unknown",

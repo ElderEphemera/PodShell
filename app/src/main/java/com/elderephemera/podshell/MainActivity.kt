@@ -33,7 +33,10 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val pagerState = rememberPagerState(0)
                     val tabs = listOf(
-                        PlaylistTab(),
+                        PlaylistTab(
+                            appContainer.feedsRepository,
+                            appContainer.episodesRepository,
+                        ),
                         NewEpisodesTab(),
                         SubscriptionsTab(
                             appContainer.feedsRepository,

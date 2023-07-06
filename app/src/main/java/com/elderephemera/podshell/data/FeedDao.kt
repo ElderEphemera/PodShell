@@ -8,6 +8,9 @@ interface FeedDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(feed: Feed): Long
 
+    @Query("SELECT * FROM feeds WHERE id = :id")
+    suspend fun get(id: Long): Feed
+
     @Query("SELECT * FROM feeds ORDER BY id DESC")
     fun getAll(): Flow<List<Feed>>
 
