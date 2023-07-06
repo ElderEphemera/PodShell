@@ -9,6 +9,7 @@ import com.elderephemera.podshell.data.Episode
 
 class EpisodeListItemCard(
     episode: Episode,
+    override val showLogo: Boolean,
 ) : ListItemCard {
     @Composable
     override fun Logo() {}

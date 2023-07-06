@@ -24,6 +24,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
 
 interface ListItemCard {
+    val showLogo: Boolean
     @Composable
     fun Logo()
 
@@ -51,11 +52,15 @@ interface ListItemCard {
                         .clickable { expanded = !expanded }
                         .padding(5.dp)
                 ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxHeight()
-                    ) {
-                        Logo()
+                    if (showLogo) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .width(75.dp)
+                        ) {
+                            Logo()
+                        }
                     }
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
