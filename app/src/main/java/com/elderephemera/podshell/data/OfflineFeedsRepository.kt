@@ -35,6 +35,7 @@ class OfflineFeedsRepository(
             val new = Episode(
                 guid = article.guid ?: article.hashCode().toString(),
                 feedId = id,
+                source = article.audio ?: "",
                 logo = article.image,
                 title = article.title ?: "",
                 url = article.link ?: url,
