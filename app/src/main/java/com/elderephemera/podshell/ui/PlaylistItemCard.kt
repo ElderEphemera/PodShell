@@ -58,9 +58,14 @@ class PlaylistItemCard(
 
         if (download?.state == Download.STATE_DOWNLOADING) {
             if (download.percentDownloaded > 0) {
-                CircularProgressIndicator(download.percentDownloaded/100)
+                CircularProgressIndicator(
+                    download.percentDownloaded/100,
+                    backgroundColor = MaterialTheme.colors.primary.copy(alpha = .3f),
+                )
             } else {
-                CircularProgressIndicator()
+                CircularProgressIndicator(
+                    backgroundColor = MaterialTheme.colors.primary.copy(alpha = .3f),
+                )
             }
             Icon(
                 Icons.Filled.Download,
@@ -75,10 +80,20 @@ class PlaylistItemCard(
             == false
         ) {
             if (player.isPlaying && player.currentMediaItem == downloadRequest.toMediaItem()) {
+                CircularProgressIndicator(
+                    player.currentPosition.toFloat()/player.duration,
+                    backgroundColor = MaterialTheme.colors.primary.copy(alpha = .25f),
+                )
                 IconButton(onClick = player::pause) {
                     Icon(Icons.Filled.Pause, contentDescription = "Pause")
                 }
             } else {
+                if (player.currentMediaItem == downloadRequest.toMediaItem()) {
+                    CircularProgressIndicator(
+                        player.currentPosition.toFloat() / player.duration,
+                        backgroundColor = MaterialTheme.colors.primary.copy(alpha = .25f),
+                    )
+                }
                 IconButton(onClick = {
                     if (player.currentMediaItem != downloadRequest.toMediaItem()) {
                         player.setMediaItem(downloadRequest.toMediaItem())
