@@ -45,7 +45,10 @@ class OfflineFeedsRepository(
                 description = article.description ?: "",
             )
             if (old != null) {
-                episodesRepository.updateEpisode(new.copy(id = old.id))
+                episodesRepository.updateEpisode(new.copy(
+                    id = old.id,
+                    inPlaylist = old.inPlaylist,
+                ))
             } else {
                 episodesRepository.insertEpisode(new.copy(new = new.new || markNew))
             }
