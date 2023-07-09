@@ -8,12 +8,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import com.elderephemera.podshell.data.Feed
+import kotlinx.coroutines.CoroutineScope
 import java.time.Instant
 import kotlin.time.Duration.Companion.seconds
 
 class FeedListItemCard(
     private val feed: Feed,
-    private val openList: () -> Unit
+    private val openList: () -> Unit,
+    private val unsubscribe: () -> Unit,
 ) : ListItemCard {
     override val showLogo = true
     @Composable
@@ -22,6 +24,8 @@ class FeedListItemCard(
         contentDescription = feed.title,
         contentScale = ContentScale.FillWidth,
     )
+
+    override fun onLongClick(coroutineScope: CoroutineScope) = unsubscribe()
 
     override val title = feed.title
     override val url = feed.url

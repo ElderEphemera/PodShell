@@ -39,11 +39,18 @@ class SubscriptionsTab(
     override fun listItems(): Flow<List<ListItemCard>> =
         feedsRepository.getAllFeeds().map {
             it.map { feed ->
-                FeedListItemCard(feed) {
-                    listDialogFeed = feed
-                    listDialogEpisodes = episodesRepository.getAllFeedEpisodes(feed)
-                    showListDialog = true
-                }
+                FeedListItemCard(
+                    feed,
+                    openList = {
+                        listDialogFeed = feed
+                        listDialogEpisodes = episodesRepository.getAllFeedEpisodes(feed)
+                        showListDialog = true
+                    },
+                    unsubscribe = {
+                        unsubscribeDialogFeed = feed
+                        showUnsubscribeDialog = true
+                    }
+                )
             }
         }
 
@@ -89,6 +96,30 @@ class SubscriptionsTab(
         }
     }
 
+    private var unsubscribeDialogFeed: Feed? by mutableStateOf(null)
+    private var showUnsubscribeDialog by mutableStateOf(false)
+    @Composable
+    private fun UnsubscribeDialog() {
+        val coroutineScope = rememberCoroutineScope()
+        AnimatedVisibility(visible = showUnsubscribeDialog) {
+            AlertDialog(
+                title = { Text("Unsubscribe from " + unsubscribeDialogFeed?.title + "?") },
+                onDismissRequest = { showUnsubscribeDialog = false },
+                dismissButton = {
+                    TextButton(onClick = { showUnsubscribeDialog = false }) { Text("CANCEL") }
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        coroutineScope.launch {
+                            unsubscribeDialogFeed?.let{ feedsRepository.deleteFeed(it) }
+                        }
+                        showUnsubscribeDialog = false
+                    }) { Text("OK") }
+                },
+            )
+        }
+    }
+
     private var listDialogFeed: Feed? by mutableStateOf(null)
     private var listDialogEpisodes: Flow<List<Episode>> by mutableStateOf(flowOf(listOf()))
     private var showListDialog by mutableStateOf(false)
@@ -124,6 +155,7 @@ class SubscriptionsTab(
     @Composable
     override fun Content() {
         AddFeedDialog()
+        UnsubscribeDialog()
         ListDialog()
         super.Content()
     }

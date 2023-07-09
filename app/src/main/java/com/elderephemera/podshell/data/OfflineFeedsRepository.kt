@@ -51,4 +51,6 @@ class OfflineFeedsRepository(
             }
         }
     }
+
+    override suspend fun deleteFeed(feed: Feed) = feedDao.delete(feed)
 }

@@ -16,4 +16,7 @@ interface FeedDao {
 
     @Update
     suspend fun update(feed: Feed)
+
+    @Delete
+    suspend fun delete(feed: Feed)
 }

@@ -7,4 +7,5 @@ interface FeedsRepository {
     suspend fun getFeed(id: Long): Feed
     fun getAllFeeds(): Flow<List<Feed>>
     suspend fun updateFeed(id: Long, url: String, markNew: Boolean)
+    suspend fun deleteFeed(feed: Feed)
 }
