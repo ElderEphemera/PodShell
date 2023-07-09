@@ -49,38 +49,40 @@ class SubscriptionsTab(
 
     private var showAddFeedDialog by mutableStateOf(false)
     @Composable
-    private fun AddFeedDialog() = AnimatedVisibility(visible = showAddFeedDialog) {
-        Dialog(
-            onDismissRequest = { showAddFeedDialog = false },
-        ) {
-            Column(
-                modifier = Modifier
-                    .background(MaterialTheme.colors.background)
-                    .padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+    private fun AddFeedDialog() {
+        val coroutineScope = rememberCoroutineScope()
+        AnimatedVisibility(visible = showAddFeedDialog) {
+            Dialog(
+                onDismissRequest = { showAddFeedDialog = false },
             ) {
-                val dataScope = rememberCoroutineScope()
-                var feedUrl by remember { mutableStateOf("") }
-                Text(text = "Add Subscription", fontSize = 20.sp)
-                TextField(
-                    value = feedUrl,
-                    onValueChange = { feedUrl = it },
-                    placeholder = { Text(text = "Paste feed URL here") },
-                )
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.CenterEnd,
+                Column(
+                    modifier = Modifier
+                        .background(MaterialTheme.colors.background)
+                        .padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    TextButton(
-                        onClick = {
-                            dataScope.launch {
-                                val feedId = feedsRepository.insertFeed(feedUrl)
-                                feedsRepository.updateFeed(feedId, feedUrl, markNew = false)
-                                showAddFeedDialog = false
-                            }
-                        },
+                    var feedUrl by remember { mutableStateOf("") }
+                    Text(text = "Add Subscription", fontSize = 20.sp)
+                    TextField(
+                        value = feedUrl,
+                        onValueChange = { feedUrl = it },
+                        placeholder = { Text(text = "Paste feed URL here") },
+                    )
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.CenterEnd,
                     ) {
-                        Text(text = "SUBSCRIBE")
+                        TextButton(
+                            onClick = {
+                                coroutineScope.launch {
+                                    val feedId = feedsRepository.insertFeed(feedUrl)
+                                    feedsRepository.updateFeed(feedId, feedUrl, markNew = false)
+                                }
+                                showAddFeedDialog = false
+                            },
+                        ) {
+                            Text(text = "SUBSCRIBE")
+                        }
                     }
                 }
             }
