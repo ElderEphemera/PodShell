@@ -100,7 +100,13 @@ class PlaylistItemCard(
                     if (player.currentMediaItem != downloadRequest.toMediaItem()) {
                         player.setMediaItem(downloadRequest.toMediaItem())
                         player.prepare()
-                        episode.position?.let(player::seekTo)
+                        episode.position?.let {
+                            if (episode.length != null && it < episode.length) {
+                                player.seekTo(it)
+                            } else {
+                                player.seekTo(0)
+                            }
+                        }
                     }
                     player.play()
                 }) {
