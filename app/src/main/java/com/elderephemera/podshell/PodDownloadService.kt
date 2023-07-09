@@ -6,10 +6,10 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import androidx.annotation.OptIn
-import androidx.core.app.NotificationCompat
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadManager
+import androidx.media3.exoplayer.offline.DownloadNotificationHelper
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.media3.exoplayer.scheduler.PlatformScheduler
 import androidx.media3.exoplayer.scheduler.Scheduler
@@ -50,11 +50,12 @@ class PodDownloadService : DownloadService(FOREGROUND_NOTIFICATION_ID) {
     override fun getForegroundNotification(
         downloads: MutableList<Download>,
         notMetRequirements: Int
-    ): Notification = NotificationCompat.Builder(this, CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_launcher_foreground)
-        .setContentTitle("Downloading podcasts")
-        .setContentText("")
-        .setPriority(NotificationCompat.PRIORITY_LOW)
-        .setSilent(true)
-        .build()
+    ): Notification = DownloadNotificationHelper(this, CHANNEL_ID).buildProgressNotification(
+        this,
+        R.drawable.ic_launcher_foreground,
+        null,
+        null,
+        downloads,
+        notMetRequirements,
+    )
 }
