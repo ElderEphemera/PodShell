@@ -13,7 +13,6 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
@@ -21,6 +20,7 @@ import androidx.media3.exoplayer.offline.DownloadService
 import coil.compose.AsyncImage
 import com.elderephemera.podshell.PodDownloadService
 import com.elderephemera.podshell.DownloadsSingleton
+import com.elderephemera.podshell.EpisodePlayer
 import com.elderephemera.podshell.data.Episode
 import com.elderephemera.podshell.data.Feed
 
@@ -28,7 +28,7 @@ import com.elderephemera.podshell.data.Feed
 class PlaylistItemCard(
     private val feed: Feed,
     private val episode: Episode,
-    private val player: Player,
+    private val player: EpisodePlayer,
 ) : ListItemCard {
     override val showLogo = true
     @Composable
@@ -98,7 +98,7 @@ class PlaylistItemCard(
             } else {
                 IconButton(onClick = {
                     if (player.currentMediaItem != downloadRequest.toMediaItem()) {
-                        player.setMediaItem(downloadRequest.toMediaItem())
+                        player.setEpisode(episode, downloadRequest.toMediaItem())
                         player.prepare()
                         episode.position?.let {
                             if (episode.length != null && it < episode.length) {

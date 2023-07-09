@@ -36,7 +36,7 @@ class OfflineFeedsRepository(
                 guid = article.guid ?: article.hashCode().toString(),
                 feedId = id,
                 source = article.audio ?: "",
-                logo = article.image,
+                logo = article.image ?: feed.logo,
                 title = article.title ?: "",
                 url = article.link ?: url,
                 pubDate = article.pubDate ?: "unknown",
