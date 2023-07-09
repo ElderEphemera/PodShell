@@ -8,6 +8,7 @@ import java.time.Instant
 data class Feed(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
+    val rss: String,
     val logo: String?,
     val title: String,
     val url: String,

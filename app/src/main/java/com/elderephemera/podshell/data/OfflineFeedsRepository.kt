@@ -9,6 +9,7 @@ class OfflineFeedsRepository(
 ) : FeedsRepository {
     override suspend fun insertFeed(url: String) = feedDao.insert(Feed(
         logo = null,
+        rss = url,
         title = url,
         url = url,
         description = "",
@@ -23,6 +24,7 @@ class OfflineFeedsRepository(
         val channel = parser.getChannel(url)
         val feed = Feed(
             id = id,
+            rss = url,
             logo = channel.image?.url,
             title = channel.title ?: "",
             url = channel.link ?: url,

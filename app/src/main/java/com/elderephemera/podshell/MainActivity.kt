@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
                             appContainer.episodesRepository,
                             player,
                         ),
-                        NewEpisodesTab(),
+                        NewEpisodesTab(appContainer.feedsRepository),
                         SubscriptionsTab(
                             appContainer.feedsRepository,
                             appContainer.episodesRepository,
