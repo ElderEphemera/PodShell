@@ -12,6 +12,8 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import com.elderephemera.podshell.data.AppDataContainer
 import com.elderephemera.podshell.ui.AppTab
 import com.elderephemera.podshell.ui.NewEpisodesTab
@@ -25,7 +27,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val appContainer = AppDataContainer(applicationContext)
-        DownloadsSingleton.getInstance(this)
+        val player = ExoPlayer.Builder(this)
+            .setMediaSourceFactory(
+                DefaultMediaSourceFactory(this).setDataSourceFactory(
+                    DownloadsSingleton.getInstance(this).cacheDataSourceFactory
+                )
+            ).build()
         setContent {
             PodShellTheme {
                 Surface(
@@ -37,6 +44,7 @@ class MainActivity : ComponentActivity() {
                         PlaylistTab(
                             appContainer.feedsRepository,
                             appContainer.episodesRepository,
+                            player,
                         ),
                         NewEpisodesTab(),
                         SubscriptionsTab(

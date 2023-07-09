@@ -11,18 +11,13 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import coil.compose.AsyncImage
 import com.elderephemera.podshell.PodDownloadService
 import com.elderephemera.podshell.DownloadsSingleton
@@ -33,6 +28,7 @@ import com.elderephemera.podshell.data.Feed
 class PlaylistItemCard(
     private val feed: Feed,
     private val episode: Episode,
+    private val player: Player,
 ) : ListItemCard {
     override val showLogo = true
     @Composable
@@ -60,8 +56,6 @@ class PlaylistItemCard(
             .downloadIndex
             .getDownload(downloadRequest.id)
 
-        var exoPlayer: ExoPlayer? by remember { mutableStateOf(null) }
-
         if (download?.state == Download.STATE_DOWNLOADING) {
             if (download.percentDownloaded > 0) {
                 CircularProgressIndicator(download.percentDownloaded/100)
@@ -80,29 +74,18 @@ class PlaylistItemCard(
                 ?.getCachedSpans(episode.guid)?.isEmpty()
             == false
         ) {
-            IconButton(onClick = {
-                if (exoPlayer == null) {
-                    ExoPlayer.Builder(context)
-                        .setMediaSourceFactory(
-                            DefaultMediaSourceFactory(context).setDataSourceFactory(
-                                DownloadsSingleton.getInstance().cacheDataSourceFactory
-                            )
-                        ).build()
-                        .apply {
-                            setMediaItem(downloadRequest.toMediaItem())
-                            prepare()
-                            exoPlayer = this
-                        }
-                }
-                if (exoPlayer?.isPlaying == true) {
-                    exoPlayer?.pause()
-                } else {
-                    exoPlayer?.play()
-                }
-            }) {
-                if (exoPlayer?.isPlaying == true) {
+            if (player.isPlaying && player.currentMediaItem == downloadRequest.toMediaItem()) {
+                IconButton(onClick = player::pause) {
                     Icon(Icons.Filled.Pause, contentDescription = "Pause")
-                } else {
+                }
+            } else {
+                IconButton(onClick = {
+                    if (player.currentMediaItem != downloadRequest.toMediaItem()) {
+                        player.setMediaItem(downloadRequest.toMediaItem())
+                        player.prepare()
+                    }
+                    player.play()
+                }) {
                     Icon(Icons.Filled.PlayArrow, contentDescription = "Play")
                 }
             }
