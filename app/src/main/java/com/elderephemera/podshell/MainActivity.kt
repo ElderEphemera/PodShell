@@ -12,6 +12,9 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.ui.LegacyPlayerControlView
 import com.elderephemera.podshell.data.AppDataContainer
 import com.elderephemera.podshell.ui.AppTab
 import com.elderephemera.podshell.ui.NewEpisodesTab
@@ -23,6 +26,7 @@ import java.util.*
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalFoundationApi::class)
+    @androidx.annotation.OptIn(UnstableApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val appContainer = AppDataContainer(applicationContext)
@@ -56,6 +60,14 @@ class MainActivity : ComponentActivity() {
                                     pagerState.animateScrollToPage(it, 0F)
                                 }
                             }
+                        },
+                        bottomBar = {
+                            AndroidView(factory = {
+                                LegacyPlayerControlView(it).apply {
+                                    setPlayer(player)
+                                    showTimeoutMs = 0
+                                }
+                            })
                         },
                     ) { padding ->
                         Box(modifier = Modifier
