@@ -17,7 +17,7 @@ class OfflineEpisodesRepository(private val episodeDao: EpisodeDao) : EpisodesRe
     }
 
     override suspend fun updateEpisodeTime(guid: String, position: Long, length: Long) =
-        episodeDao.updatePosition(guid, position, length)
+        episodeDao.updateTime(guid, position, length)
 
     override fun getAllFeedEpisodes(feed: Feed) = episodeDao.getAllFromFeed(feed.id)
 
