@@ -30,9 +30,11 @@ class SubscriptionsTab(
     override val title = "SUBSCRIPTIONS"
 
     @Composable
-    override fun FabIcon() =
-        Icon(Icons.Filled.Add, contentDescription = "Add podcast feed")
-    override fun fabOnClick() { showAddFeedDialog = true }
+    override fun Fab() = FloatingActionButton(
+        onClick = { showAddFeedDialog = true },
+        backgroundColor = MaterialTheme.colors.primary,
+        content = { Icon(Icons.Filled.Add, contentDescription = "Add podcast feed") },
+    )
 
     override fun listItems(): Flow<List<ListItemCard>> =
         feedsRepository.getAllFeeds().map {

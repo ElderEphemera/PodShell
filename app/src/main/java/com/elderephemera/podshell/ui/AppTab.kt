@@ -3,8 +3,6 @@ package com.elderephemera.podshell.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -16,21 +14,14 @@ interface AppTab {
     val title : String
 
     @Composable
-    fun FabIcon()
-    fun fabOnClick()
+    fun Fab()
 
     fun listItems(): Flow<List<ListItemCard>>
 
     @Composable
     fun Content() = Scaffold(
         modifier = Modifier.fillMaxSize(),
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = this::fabOnClick,
-                backgroundColor = MaterialTheme.colors.primary,
-                content = { FabIcon() },
-            )
-        },
+        floatingActionButton = { Fab() },
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             val listItems by listItems().collectAsState(listOf())
