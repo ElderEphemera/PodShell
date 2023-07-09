@@ -74,7 +74,7 @@ class EpisodePlayer private constructor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = "Player"
             val descriptionText = "Episode player display and controls"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val importance = NotificationManager.IMPORTANCE_LOW
             val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
                 description = descriptionText
             }
