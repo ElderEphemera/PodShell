@@ -18,7 +18,7 @@ class NewEpisodesTab(
     private val feedsRepository: FeedsRepository,
     private val episodesRepository: EpisodesRepository,
 ) : AppTab {
-    override val title = "NEW EPISODES"
+    override val title = "NEW"
 
     override fun listItems(): Flow<List<ListItemCard>> =
         episodesRepository.getAllNewEpisodes().map {

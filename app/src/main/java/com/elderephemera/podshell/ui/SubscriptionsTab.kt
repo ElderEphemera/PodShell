@@ -27,7 +27,7 @@ class SubscriptionsTab(
     private val feedsRepository: FeedsRepository,
     private val episodesRepository: EpisodesRepository,
 ) : AppTab {
-    override val title = "SUBSCRIPTIONS"
+    override val title = "SUBS"
 
     @Composable
     override fun Fab() = FloatingActionButton(
