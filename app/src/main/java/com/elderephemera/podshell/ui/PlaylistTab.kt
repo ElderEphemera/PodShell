@@ -23,7 +23,7 @@ class PlaylistTab(
         episodesRepository.getAllEpisodesInPlaylist().map {
             it.map { episode ->
                 val feed = feedsRepository.getFeed(episode.feedId)
-                PlaylistItemCard(feed, episode, player)
+                PlaylistItemCard(feed, episode, player, episodesRepository)
             }
         }
 

@@ -22,13 +22,17 @@ import com.elderephemera.podshell.PodDownloadService
 import com.elderephemera.podshell.DownloadsSingleton
 import com.elderephemera.podshell.EpisodePlayer
 import com.elderephemera.podshell.data.Episode
+import com.elderephemera.podshell.data.EpisodesRepository
 import com.elderephemera.podshell.data.Feed
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(UnstableApi::class)
 class PlaylistItemCard(
     private val feed: Feed,
     private val episode: Episode,
     private val player: EpisodePlayer,
+    private val episodesRepository: EpisodesRepository,
 ) : ListItemCard {
     override val showLogo = true
     @Composable
@@ -42,6 +46,12 @@ class PlaylistItemCard(
     override val url = episode.url
     override val subtitle = feed.title
     override val description = episode.description
+
+    override fun onLongClick(coroutineScope: CoroutineScope) {
+        coroutineScope.launch {
+            episodesRepository.updateEpisode(episode.copy(inPlaylist = false))
+        }
+    }
 
     @Composable
     override fun ActionButton() {

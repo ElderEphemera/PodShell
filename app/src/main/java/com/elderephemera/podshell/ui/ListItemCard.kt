@@ -2,8 +2,10 @@ package com.elderephemera.podshell.ui
 
 import android.text.TextUtils
 import android.widget.TextView
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
+import kotlinx.coroutines.CoroutineScope
 
 interface ListItemCard {
     val showLogo: Boolean
@@ -36,8 +39,12 @@ interface ListItemCard {
     @Composable
     fun ActionButton()
 
+    fun onLongClick(coroutineScope: CoroutineScope) {}
+
+    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun Content() {
+        val coroutineScope = rememberCoroutineScope()
         Column(
             modifier = Modifier
                 .background(MaterialTheme.colors.surface)
@@ -49,7 +56,10 @@ interface ListItemCard {
                     horizontalArrangement = Arrangement.spacedBy(5.dp),
                     modifier = Modifier
                         .weight(1f)
-                        .clickable { expanded = !expanded }
+                        .combinedClickable(
+                            onClick = { expanded = !expanded },
+                            onLongClick = { onLongClick(coroutineScope) }
+                        )
                         .padding(5.dp)
                 ) {
                     if (showLogo) {
