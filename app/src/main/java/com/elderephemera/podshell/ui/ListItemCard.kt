@@ -104,12 +104,6 @@ interface ListItemCard {
                 }
             }
             Divider(color = MaterialTheme.colors.background)
-            /*Text(
-                text = description,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = if (expanded) Int.MAX_VALUE else 1,
-                modifier = Modifier.padding(5.dp)
-            )*/
             val onSurface = MaterialTheme.colors.onSurface.toArgb()
             AndroidView(
                 factory = { context ->
@@ -120,7 +114,10 @@ interface ListItemCard {
                         setTextColor(onSurface)
                     }
                 },
-                update = { it.maxLines = if (expanded) Int.MAX_VALUE else 1 },
+                update = {
+                    it.text = HtmlCompat.fromHtml(description, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                    it.maxLines = if (expanded) Int.MAX_VALUE else 1
+                },
                 modifier = Modifier.padding(5.dp)
             )
         }
