@@ -20,7 +20,7 @@ class OfflineFeedsRepository(
     override fun getAllFeeds() = feedDao.getAll()
 
     private val parser = Parser.Builder().build()
-    override suspend fun updateFeed(id: Long, url: String) {
+    override suspend fun updateFeed(id: Long, url: String, markNew: Boolean) {
         val channel = parser.getChannel(url)
         val feed = Feed(
             id = id,
@@ -47,7 +47,7 @@ class OfflineFeedsRepository(
             if (old != null) {
                 episodesRepository.updateEpisode(new.copy(id = old.id))
             } else {
-                episodesRepository.insertEpisode(new)
+                episodesRepository.insertEpisode(new.copy(new = new.new || markNew))
             }
         }
     }

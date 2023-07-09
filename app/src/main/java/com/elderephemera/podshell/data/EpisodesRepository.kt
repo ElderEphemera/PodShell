@@ -8,4 +8,5 @@ interface EpisodesRepository {
     suspend fun updateEpisodeTime(guid: String, position: Long, length: Long)
     fun getAllFeedEpisodes(feed: Feed): Flow<List<Episode>>
     fun getAllEpisodesInPlaylist(): Flow<List<Episode>>
+    fun getAllNewEpisodes(): Flow<List<Episode>>
 }

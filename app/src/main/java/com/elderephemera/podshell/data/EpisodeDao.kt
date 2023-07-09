@@ -19,4 +19,7 @@ interface EpisodeDao {
 
     @Query("SELECT * FROM episodes WHERE inPlaylist = TRUE")
     fun getAllInPlaylist(): Flow<List<Episode>>
+
+    @Query("SELECT * FROM episodes WHERE new = TRUE")
+    fun getAllNew(): Flow<List<Episode>>
 }

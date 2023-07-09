@@ -75,7 +75,7 @@ class SubscriptionsTab(
                         onClick = {
                             dataScope.launch {
                                 val feedId = feedsRepository.insertFeed(feedUrl)
-                                feedsRepository.updateFeed(feedId, feedUrl)
+                                feedsRepository.updateFeed(feedId, feedUrl, markNew = false)
                                 showAddFeedDialog = false
                             }
                         },
@@ -112,7 +112,9 @@ class SubscriptionsTab(
                         .padding(10.dp)
                 )
                 val episodes by listDialogEpisodes.collectAsState(listOf())
-                episodes.map { EpisodeListItemCard(it, episodesRepository) }.ItemCardList()
+                episodes.map {
+                    EpisodeListItemCard(it, episodesRepository, showLogo = false)
+                }.ItemCardList()
             }
         }
     }

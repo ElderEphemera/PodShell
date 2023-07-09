@@ -22,4 +22,6 @@ class OfflineEpisodesRepository(private val episodeDao: EpisodeDao) : EpisodesRe
     override fun getAllFeedEpisodes(feed: Feed) = episodeDao.getAllFromFeed(feed.id)
 
     override fun getAllEpisodesInPlaylist() = episodeDao.getAllInPlaylist()
+
+    override fun getAllNewEpisodes() = episodeDao.getAllNew()
 }

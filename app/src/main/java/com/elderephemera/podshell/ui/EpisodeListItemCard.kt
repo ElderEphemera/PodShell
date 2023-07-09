@@ -7,6 +7,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import com.elderephemera.podshell.data.Episode
 import com.elderephemera.podshell.data.EpisodesRepository
 import kotlinx.coroutines.launch
@@ -14,10 +16,14 @@ import kotlinx.coroutines.launch
 class EpisodeListItemCard(
     private val episode: Episode,
     private val episodesRepository: EpisodesRepository,
+    override val showLogo: Boolean,
 ) : ListItemCard {
-    override val showLogo = false
     @Composable
-    override fun Logo() {}
+    override fun Logo() = AsyncImage(
+        model = episode.logo,
+        contentDescription = episode.title,
+        contentScale = ContentScale.FillWidth,
+    )
 
     override val title = episode.title
     override val url = episode.url
@@ -30,7 +36,10 @@ class EpisodeListItemCard(
         IconButton(
             onClick = {
                 coroutineScope.launch {
-                    episodesRepository.updateEpisode(episode.copy(inPlaylist = !episode.inPlaylist))
+                    episodesRepository.updateEpisode(episode.copy(
+                        inPlaylist = !episode.inPlaylist,
+                        new = false,
+                    ))
                 }
             },
         ) {
