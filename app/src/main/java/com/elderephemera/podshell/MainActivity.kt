@@ -25,6 +25,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val appContainer = AppDataContainer(applicationContext)
+        DownloadsSingleton.getInstance(this)
         setContent {
             PodShellTheme {
                 Surface(
