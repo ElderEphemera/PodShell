@@ -12,6 +12,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import com.elderephemera.podshell.data.AppDataContainer
@@ -20,19 +21,44 @@ import com.elderephemera.podshell.ui.NewEpisodesTab
 import com.elderephemera.podshell.ui.PlaylistTab
 import com.elderephemera.podshell.ui.SubscriptionsTab
 import com.elderephemera.podshell.ui.theme.PodShellTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.concurrent.timerTask
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val appContainer = AppDataContainer(applicationContext)
+
         val player = ExoPlayer.Builder(this)
             .setMediaSourceFactory(
                 DefaultMediaSourceFactory(this).setDataSourceFactory(
                     DownloadsSingleton.getInstance(this).cacheDataSourceFactory
                 )
             ).build()
+        player.addListener(object : Player.Listener {
+            private val timer = Timer()
+            private var timerTask: TimerTask? = null
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                if (isPlaying) {
+                    timerTask = timerTask {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            player.currentMediaItem?.mediaId?.let {
+                                appContainer.episodesRepository
+                                    .updateEpisodeTime(it, player.currentPosition, player.duration)
+                            }
+                        }
+                    }
+                    timer.scheduleAtFixedRate(timerTask, 0, 1000)
+                } else {
+                    timerTask?.cancel()
+                }
+            }
+        })
+
         setContent {
             PodShellTheme {
                 Surface(

@@ -11,6 +11,9 @@ interface EpisodeDao {
     @Update()
     suspend fun update(episode: Episode)
 
+    @Query("UPDATE episodes SET position = :position, length = :length WHERE guid = :guid")
+    suspend fun updatePosition(guid: String, position: Long, length: Long)
+
     @Query("SELECT * FROM episodes WHERE feedId = :feedId")
     fun getAllFromFeed(feedId: Long): Flow<List<Episode>>
 

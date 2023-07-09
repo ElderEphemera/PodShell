@@ -79,25 +79,28 @@ class PlaylistItemCard(
                 ?.getCachedSpans(episode.guid)?.isEmpty()
             == false
         ) {
-            if (player.isPlaying && player.currentMediaItem == downloadRequest.toMediaItem()) {
+            if (player.currentMediaItem == downloadRequest.toMediaItem()) {
                 CircularProgressIndicator(
                     player.currentPosition.toFloat()/player.duration,
                     backgroundColor = MaterialTheme.colors.primary.copy(alpha = .25f),
                 )
+            } else if (episode.position != null && episode.length != null) {
+                CircularProgressIndicator(
+                    episode.position.toFloat()/episode.length,
+                    backgroundColor = MaterialTheme.colors.primary.copy(alpha = .25f),
+                )
+            }
+
+            if (player.isPlaying && player.currentMediaItem == downloadRequest.toMediaItem()) {
                 IconButton(onClick = player::pause) {
                     Icon(Icons.Filled.Pause, contentDescription = "Pause")
                 }
             } else {
-                if (player.currentMediaItem == downloadRequest.toMediaItem()) {
-                    CircularProgressIndicator(
-                        player.currentPosition.toFloat() / player.duration,
-                        backgroundColor = MaterialTheme.colors.primary.copy(alpha = .25f),
-                    )
-                }
                 IconButton(onClick = {
                     if (player.currentMediaItem != downloadRequest.toMediaItem()) {
                         player.setMediaItem(downloadRequest.toMediaItem())
                         player.prepare()
+                        episode.position?.let(player::seekTo)
                     }
                     player.play()
                 }) {
