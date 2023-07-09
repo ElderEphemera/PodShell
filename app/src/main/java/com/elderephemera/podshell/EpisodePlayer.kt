@@ -107,20 +107,28 @@ class EpisodePlayer private constructor(
 
         override fun getCurrentContentText(player: Player): CharSequence? = null
 
+        private var recentEpisodeGuid: String? = null
+        private var recentEpisodeLogo: Bitmap? = null
         override fun getCurrentLargeIcon(
             player: Player,
             callback: PlayerNotificationManager.BitmapCallback
         ): Bitmap? {
             episodePlayer.currentEpisode?.let { episode ->
-                val request = ImageRequest.Builder(context)
-                    .data(episode.logo)
-                    .target(onSuccess = { result ->
-                        if(result is BitmapDrawable) {
-                            callback.onBitmap(result.bitmap)
-                        }
-                    })
-                    .build()
-                context.imageLoader.enqueue(request)
+                if (recentEpisodeGuid == episode.guid && recentEpisodeLogo != null) {
+                    return recentEpisodeLogo
+                } else {
+                    val request = ImageRequest.Builder(context)
+                        .data(episode.logo)
+                        .target(onSuccess = { result ->
+                            if (result is BitmapDrawable) {
+                                recentEpisodeGuid = episode.guid
+                                recentEpisodeLogo = result.bitmap
+                                callback.onBitmap(result.bitmap)
+                            }
+                        })
+                        .build()
+                    context.imageLoader.enqueue(request)
+                }
             }
             return null
         }
