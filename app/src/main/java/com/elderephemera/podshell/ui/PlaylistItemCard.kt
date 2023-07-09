@@ -2,6 +2,7 @@ package com.elderephemera.podshell.ui
 
 import android.net.Uri
 import androidx.annotation.OptIn
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -62,6 +63,11 @@ class PlaylistItemCard(
         var exoPlayer: ExoPlayer? by remember { mutableStateOf(null) }
 
         if (download?.state == Download.STATE_DOWNLOADING) {
+            if (download.percentDownloaded > 0) {
+                CircularProgressIndicator(download.percentDownloaded/100)
+            } else {
+                CircularProgressIndicator()
+            }
             Icon(
                 Icons.Filled.Download,
                 contentDescription = "Downloading",
