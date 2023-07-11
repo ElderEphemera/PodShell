@@ -44,49 +44,48 @@ class EpisodePlayer private constructor(
             )
             .build()
     ) {
-        addListener(UpdateTimePlayerListener(this, episodesRepository))
+        addListener(updateTimePlayerListener(episodesRepository))
         startPlayerService(context)
         createNotificationChannel(context)
         setupNotificationManager(context)
     }
 
-    private class UpdateTimePlayerListener(
-        private val player: Player,
-        private val episodesRepository: EpisodesRepository,
-    ) : Player.Listener {
-        private val timer = Timer()
-        private var timerTask: TimerTask? = null
-        override fun onIsPlayingChanged(isPlaying: Boolean) {
-            if (isPlaying) {
-                timerTask = timerTask {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        player.currentMediaItem?.mediaId?.let {
-                            episodesRepository
-                                .updateEpisodeTime(it, player.currentPosition, player.duration)
+    private fun updateTimePlayerListener(episodesRepository: EpisodesRepository) =
+        object : Player.Listener {
+            private val timer = Timer()
+            private var timerTask: TimerTask? = null
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                if (isPlaying) {
+                    timerTask = timerTask {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            currentMediaItem?.mediaId?.let {
+                                episodesRepository.updateEpisodeTime(it, currentPosition, duration)
+                            }
                         }
                     }
+                    timer.scheduleAtFixedRate(timerTask, 0, 1000)
+                } else {
+                    timerTask?.cancel()
                 }
-                timer.scheduleAtFixedRate(timerTask, 0, 1000)
-            } else {
-                timerTask?.cancel()
             }
         }
-    }
 
-    private var playerService: Service? = null
+    private var playerServiceBinder: PlayerService.Binder? = null
 
     private fun startPlayerService(context: Context) {
-        val intent = Intent(context, PlayerService::class.java)
-        context.startService(intent)
-        context.bindService(intent, object : ServiceConnection {
-            override fun onServiceConnected(component: ComponentName?, binder: IBinder?) {
-                playerService = (binder as PlayerService.Binder).service
-            }
+        if (playerServiceBinder == null) {
+            val intent = Intent(context, PlayerService::class.java)
+            context.startService(intent)
+            context.bindService(intent, object : ServiceConnection {
+                override fun onServiceConnected(component: ComponentName?, binder: IBinder?) {
+                    playerServiceBinder = binder as PlayerService.Binder
+                }
 
-            override fun onServiceDisconnected(component: ComponentName?) {
-                playerService = null
-            }
-        }, 0)
+                override fun onServiceDisconnected(component: ComponentName?) {
+                    playerServiceBinder = null
+                }
+            }, 0)
+        }
     }
 
     private fun createNotificationChannel(context: Context) {
@@ -108,67 +107,64 @@ class EpisodePlayer private constructor(
         context: Context,
     ) = PlayerNotificationManager
         .Builder(context, NOTIFICATION_ID, CHANNEL_ID)
-        .setMediaDescriptionAdapter(EpisodeMediaDescriptionAdapter(context, this))
-        .setNotificationListener(EpisodeNotificationListener(this))
+        .setMediaDescriptionAdapter(mediaDescriptionAdapter(context))
+        .setNotificationListener(notificationListener)
         .build().apply {
             setPlayer(this@EpisodePlayer)
             setUseChronometer(true)
             setUsePreviousAction(false)
         }
 
-    private class EpisodeMediaDescriptionAdapter(
-        private val context: Context,
-        private val episodePlayer: EpisodePlayer,
-    ) : PlayerNotificationManager.MediaDescriptionAdapter {
-        override fun getCurrentContentTitle(player: Player): CharSequence =
-            episodePlayer.currentEpisode?.title ?: "Podshell"
+    private fun mediaDescriptionAdapter(context: Context) =
+        object : PlayerNotificationManager.MediaDescriptionAdapter {
+            override fun getCurrentContentTitle(player: Player): CharSequence =
+                currentEpisode?.title ?: "Podshell"
 
-        override fun createCurrentContentIntent(player: Player): PendingIntent? = null
+            override fun createCurrentContentIntent(player: Player): PendingIntent? = null
 
-        override fun getCurrentContentText(player: Player): CharSequence? = null
+            override fun getCurrentContentText(player: Player): CharSequence? = null
 
-        private var recentEpisodeGuid: String? = null
-        private var recentEpisodeLogo: Bitmap? = null
-        override fun getCurrentLargeIcon(
-            player: Player,
-            callback: PlayerNotificationManager.BitmapCallback
-        ): Bitmap? {
-            episodePlayer.currentEpisode?.let { episode ->
-                if (recentEpisodeGuid == episode.guid && recentEpisodeLogo != null) {
-                    return recentEpisodeLogo
+            private var recentEpisodeGuid: String? = null
+            private var recentEpisodeLogo: Bitmap? = null
+            override fun getCurrentLargeIcon(
+                player: Player,
+                callback: PlayerNotificationManager.BitmapCallback
+            ): Bitmap? {
+                currentEpisode?.let { episode ->
+                    if (recentEpisodeGuid == episode.guid && recentEpisodeLogo != null) {
+                        return recentEpisodeLogo
+                    } else {
+                        val request = ImageRequest.Builder(context)
+                            .data(episode.logo)
+                            .target(onSuccess = { result ->
+                                if (result is BitmapDrawable) {
+                                    recentEpisodeGuid = episode.guid
+                                    recentEpisodeLogo = result.bitmap
+                                    callback.onBitmap(result.bitmap)
+                                }
+                            })
+                            .build()
+                        context.imageLoader.enqueue(request)
+                    }
+                }
+                return null
+            }
+        }
+
+    private val notificationListener =
+        object : PlayerNotificationManager.NotificationListener {
+            override fun onNotificationPosted(
+                notificationId: Int,
+                notification: Notification,
+                ongoing: Boolean
+            ) {
+                if (ongoing) {
+                    playerServiceBinder?.service?.startForeground(notificationId, notification)
                 } else {
-                    val request = ImageRequest.Builder(context)
-                        .data(episode.logo)
-                        .target(onSuccess = { result ->
-                            if (result is BitmapDrawable) {
-                                recentEpisodeGuid = episode.guid
-                                recentEpisodeLogo = result.bitmap
-                                callback.onBitmap(result.bitmap)
-                            }
-                        })
-                        .build()
-                    context.imageLoader.enqueue(request)
+                    playerServiceBinder?.service?.stopForeground(Service.STOP_FOREGROUND_DETACH)
                 }
             }
-            return null
         }
-    }
-
-    private class EpisodeNotificationListener(
-        private val episodePlayer: EpisodePlayer,
-    ) : PlayerNotificationManager.NotificationListener {
-        override fun onNotificationPosted(
-            notificationId: Int,
-            notification: Notification,
-            ongoing: Boolean
-        ) {
-            if (ongoing) {
-                episodePlayer.playerService?.startForeground(notificationId, notification)
-            } else {
-                episodePlayer.playerService?.stopForeground(Service.STOP_FOREGROUND_DETACH)
-            }
-        }
-    }
 
     var currentEpisode: Episode? = null
         private set
