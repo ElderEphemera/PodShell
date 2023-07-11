@@ -123,7 +123,14 @@ class EpisodePlayer private constructor(
             override fun getCurrentContentTitle(player: Player): CharSequence =
                 currentEpisode?.title ?: "Podshell"
 
-            override fun createCurrentContentIntent(player: Player): PendingIntent? = null
+            override fun createCurrentContentIntent(player: Player): PendingIntent? =
+                TaskStackBuilder.create(context).run {
+                    addNextIntentWithParentStack(Intent(context, MainActivity::class.java))
+                    getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                    )
+                }
 
             override fun getCurrentContentText(player: Player): CharSequence? = null
 
