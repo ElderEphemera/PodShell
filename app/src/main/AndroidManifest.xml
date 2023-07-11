@@ -34,6 +34,13 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </service>
+
+        <service android:name=".PlayerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.Main"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

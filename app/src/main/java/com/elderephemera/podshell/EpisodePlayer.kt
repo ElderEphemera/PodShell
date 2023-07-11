@@ -1,12 +1,14 @@
 package com.elderephemera.podshell
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.os.Build
+import android.os.IBinder
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -43,6 +45,7 @@ class EpisodePlayer private constructor(
             .build()
     ) {
         addListener(UpdateTimePlayerListener(this, episodesRepository))
+        startPlayerService(context)
         createNotificationChannel(context)
         setupNotificationManager(context)
     }
@@ -70,6 +73,22 @@ class EpisodePlayer private constructor(
         }
     }
 
+    private var playerService: Service? = null
+
+    private fun startPlayerService(context: Context) {
+        val intent = Intent(context, PlayerService::class.java)
+        context.startService(intent)
+        context.bindService(intent, object : ServiceConnection {
+            override fun onServiceConnected(component: ComponentName?, binder: IBinder?) {
+                playerService = (binder as PlayerService.Binder).service
+            }
+
+            override fun onServiceDisconnected(component: ComponentName?) {
+                playerService = null
+            }
+        }, 0)
+    }
+
     private fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = "Player"
@@ -90,6 +109,7 @@ class EpisodePlayer private constructor(
     ) = PlayerNotificationManager
         .Builder(context, NOTIFICATION_ID, CHANNEL_ID)
         .setMediaDescriptionAdapter(EpisodeMediaDescriptionAdapter(context, this))
+        .setNotificationListener(EpisodeNotificationListener(this))
         .build().apply {
             setPlayer(this@EpisodePlayer)
             setUseChronometer(true)
@@ -131,6 +151,22 @@ class EpisodePlayer private constructor(
                 }
             }
             return null
+        }
+    }
+
+    private class EpisodeNotificationListener(
+        private val episodePlayer: EpisodePlayer,
+    ) : PlayerNotificationManager.NotificationListener {
+        override fun onNotificationPosted(
+            notificationId: Int,
+            notification: Notification,
+            ongoing: Boolean
+        ) {
+            if (ongoing) {
+                episodePlayer.playerService?.startForeground(notificationId, notification)
+            } else {
+                episodePlayer.playerService?.stopForeground(Service.STOP_FOREGROUND_DETACH)
+            }
         }
     }
 
