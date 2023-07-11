@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val appContainer = AppDataContainer(applicationContext)
 
-        val player = EpisodePlayer(this, appContainer.episodesRepository)
+        val player = EpisodePlayer.getInstance(this, appContainer.episodesRepository)
 
         setContent {
             PodShellTheme {

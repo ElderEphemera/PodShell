@@ -33,21 +33,24 @@ class EpisodePlayer private constructor(
     companion object {
         private const val NOTIFICATION_ID = 2
         private const val CHANNEL_ID = "player"
-    }
 
-    constructor(context: Context, episodesRepository: EpisodesRepository) : this(
-        underlyingPlayer = ExoPlayer.Builder(context)
-            .setMediaSourceFactory(
-                DefaultMediaSourceFactory(context).setDataSourceFactory(
-                    DownloadsSingleton.getInstance(context).cacheDataSourceFactory
-                )
-            )
-            .build()
-    ) {
-        addListener(updateTimePlayerListener(episodesRepository))
-        startPlayerService(context)
-        createNotificationChannel(context)
-        setupNotificationManager(context)
+        private var instance: EpisodePlayer? = null
+        fun getInstance(context: Context, episodesRepository: EpisodesRepository) =
+            instance ?: EpisodePlayer(
+                underlyingPlayer = ExoPlayer.Builder(context)
+                    .setMediaSourceFactory(
+                        DefaultMediaSourceFactory(context).setDataSourceFactory(
+                            DownloadsSingleton.getInstance(context).cacheDataSourceFactory
+                        )
+                    )
+                    .build()
+            ).apply {
+                addListener(updateTimePlayerListener(episodesRepository))
+                startPlayerService(context)
+                createNotificationChannel(context)
+                setupNotificationManager(context)
+                instance = this
+            }
     }
 
     private fun updateTimePlayerListener(episodesRepository: EpisodesRepository) =
