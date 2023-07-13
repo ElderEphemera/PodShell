@@ -38,6 +38,9 @@ class OfflineFeedsRepository(
                 guid = article.guid ?: article.hashCode().toString(),
                 feedId = id,
                 source = article.audio ?: "",
+                inPlaylist = old?.inPlaylist ?: false,
+                position = old?.position,
+                length = old?.length,
                 logo = article.image ?: feed.logo,
                 title = article.title ?: "",
                 url = article.link ?: url,
@@ -45,10 +48,7 @@ class OfflineFeedsRepository(
                 description = article.description ?: "",
             )
             if (old != null) {
-                episodesRepository.updateEpisode(new.copy(
-                    id = old.id,
-                    inPlaylist = old.inPlaylist,
-                ))
+                episodesRepository.updateEpisode(new.copy(id = old.id))
             } else {
                 episodesRepository.insertEpisode(new.copy(new = new.new || markNew))
             }
