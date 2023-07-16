@@ -13,6 +13,8 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
@@ -20,7 +22,6 @@ import androidx.media3.exoplayer.offline.DownloadService
 import coil.compose.AsyncImage
 import com.elderephemera.podshell.PodDownloadService
 import com.elderephemera.podshell.DownloadsSingleton
-import com.elderephemera.podshell.EpisodePlayer
 import com.elderephemera.podshell.data.Episode
 import com.elderephemera.podshell.data.EpisodesRepository
 import com.elderephemera.podshell.data.Feed
@@ -31,9 +32,26 @@ import kotlinx.coroutines.launch
 class PlaylistItemCard(
     private val feed: Feed,
     private val episode: Episode,
-    private val player: EpisodePlayer,
+    private val player: Player,
     private val episodesRepository: EpisodesRepository,
 ) : ListItemCard {
+    companion object {
+        private fun Player.seekToOnReady(positionMs: Long) {
+            if (availableCommands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM)) {
+                seekTo(positionMs)
+            } else {
+                addListener(object : Player.Listener {
+                    override fun onAvailableCommandsChanged(availableCommands: Player.Commands) {
+                        if (availableCommands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM)) {
+                            seekTo(positionMs)
+                            removeListener(this)
+                        }
+                    }
+                })
+            }
+        }
+    }
+
     override val showLogo = true
     @Composable
     override fun Logo() = AsyncImage(
@@ -89,7 +107,7 @@ class PlaylistItemCard(
                 ?.getCachedSpans(episode.guid)?.isEmpty()
             == false
         ) {
-            if (player.currentMediaItem == downloadRequest.toMediaItem()) {
+            if (player.currentMediaItem?.mediaId == episode.guid) {
                 CircularProgressIndicator(
                     player.currentPosition.toFloat()/player.duration,
                     backgroundColor = MaterialTheme.colors.primary.copy(alpha = .25f),
@@ -101,20 +119,29 @@ class PlaylistItemCard(
                 )
             }
 
-            if (player.isPlaying && player.currentMediaItem == downloadRequest.toMediaItem()) {
+            if (player.isPlaying && player.currentMediaItem?.mediaId == episode.guid) {
                 IconButton(onClick = player::pause) {
                     Icon(Icons.Filled.Pause, contentDescription = "Pause")
                 }
             } else {
                 IconButton(onClick = {
-                    if (player.currentMediaItem != downloadRequest.toMediaItem()) {
-                        player.setEpisode(episode, downloadRequest.toMediaItem())
+                    if (player.currentMediaItem?.mediaId != episode.guid) {
+                        val downloadMediaItem = downloadRequest.toMediaItem()
+                        val metadata = MediaMetadata.Builder()
+                            .populate(downloadMediaItem.mediaMetadata)
+                            .setTitle(episode.title)
+                            .setArtist(feed.title)
+                            .setArtworkUri(episode.logo?.let(Uri::parse))
+                            .build()
+                        player.setMediaItem(downloadMediaItem.buildUpon()
+                            .setMediaMetadata(metadata)
+                            .build())
                         player.prepare()
                         episode.position?.let {
                             if (episode.length != null && it < episode.length) {
-                                player.seekTo(it)
+                                player.seekToOnReady(it)
                             } else {
-                                player.seekTo(0)
+                                player.seekToOnReady(0)
                             }
                         }
                     }

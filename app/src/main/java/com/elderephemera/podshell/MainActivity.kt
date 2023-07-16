@@ -1,5 +1,6 @@
 package com.elderephemera.podshell
 
+import android.content.ComponentName
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,7 +14,10 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
 import androidx.media3.ui.LegacyPlayerControlView
 import com.elderephemera.podshell.data.AppDataContainer
 import com.elderephemera.podshell.ui.AppTab
@@ -25,13 +29,21 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 class MainActivity : ComponentActivity() {
+    private var controller: MediaController? by mutableStateOf(null)
+
     @OptIn(ExperimentalFoundationApi::class)
     @androidx.annotation.OptIn(UnstableApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val appContainer = AppDataContainer(applicationContext)
 
-        val player = EpisodePlayer.getInstance(this, appContainer.episodesRepository)
+        val sessionToken =
+            SessionToken(this, ComponentName(this, PlayerService::class.java))
+        val controllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
+        controllerFuture.addListener(
+            { controller = controllerFuture.get() },
+            ContextCompat.getMainExecutor(this)
+        )
 
         setContent {
             PodShellTheme {
@@ -39,49 +51,56 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    val pagerState = rememberPagerState(0)
-                    val tabs = listOf(
-                        PlaylistTab(
-                            appContainer.feedsRepository,
-                            appContainer.episodesRepository,
-                            player,
-                        ),
-                        NewEpisodesTab(
-                            appContainer.feedsRepository,
-                            appContainer.episodesRepository,
-                        ),
-                        SubscriptionsTab(
-                            appContainer.feedsRepository,
-                            appContainer.episodesRepository,
-                        ),
-                    )
-                    val animationScope = rememberCoroutineScope()
-                    Scaffold(
-                        topBar = {
-                            TabBar(tabs, pagerState.currentPage) {
-                                animationScope.launch {
-                                    pagerState.animateScrollToPage(it, 0F)
+                    controller?.let { player ->
+                        val pagerState = rememberPagerState(0)
+                        val tabs = listOf(
+                            PlaylistTab(
+                                appContainer.feedsRepository,
+                                appContainer.episodesRepository,
+                                player,
+                            ),
+                            NewEpisodesTab(
+                                appContainer.feedsRepository,
+                                appContainer.episodesRepository,
+                            ),
+                            SubscriptionsTab(
+                                appContainer.feedsRepository,
+                                appContainer.episodesRepository,
+                            ),
+                        )
+                        val animationScope = rememberCoroutineScope()
+                        Scaffold(
+                            topBar = {
+                                TabBar(tabs, pagerState.currentPage) {
+                                    animationScope.launch {
+                                        pagerState.animateScrollToPage(it, 0F)
+                                    }
                                 }
+                            },
+                            bottomBar = {
+                                AndroidView(factory = {
+                                    LegacyPlayerControlView(it).apply {
+                                        setPlayer(player)
+                                        showTimeoutMs = 0
+                                    }
+                                })
+                            },
+                        ) { padding ->
+                            Box(modifier = Modifier
+                                .fillMaxSize()
+                                .padding(padding)) {
+                                Pages(tabs, pagerState)
                             }
-                        },
-                        bottomBar = {
-                            AndroidView(factory = {
-                                LegacyPlayerControlView(it).apply {
-                                    setPlayer(player)
-                                    showTimeoutMs = 0
-                                }
-                            })
-                        },
-                    ) { padding ->
-                        Box(modifier = Modifier
-                            .fillMaxSize()
-                            .padding(padding)) {
-                            Pages(tabs, pagerState)
                         }
                     }
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        controller?.release()
+        super.onDestroy()
     }
 }
 
