@@ -1,6 +1,7 @@
 package com.elderephemera.podshell.ui
 
 import android.text.TextUtils
+import android.text.method.LinkMovementMethod
 import android.widget.TextView
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -52,6 +53,7 @@ interface ListItemCard {
                 .fillMaxWidth()
         ) {
             var expanded by remember { mutableStateOf(false) }
+            val linkColor = Color(0xFF64B5F6)
             Row(modifier = Modifier.height(IntrinsicSize.Min)) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(5.dp),
@@ -88,7 +90,7 @@ interface ListItemCard {
                             overflow = TextOverflow.Ellipsis,
                             maxLines = if (expanded) Int.MAX_VALUE else 1,
                             textDecoration = TextDecoration.Underline,
-                            color = Color(0xFF64B5F6),
+                            color = linkColor,
                             modifier = Modifier.clickable { uriHandler.openUri(url) }
                         )
                         Text(
@@ -123,7 +125,10 @@ interface ListItemCard {
                         ellipsize = TextUtils.TruncateAt.END
                         maxLines = if (expanded) Int.MAX_VALUE else 1
                         setTextColor(onSurface)
+                        setLinkTextColor(linkColor.toArgb())
                         textSize = 13f
+                        linksClickable = true
+                        movementMethod = LinkMovementMethod.getInstance()
                     }
                 },
                 update = {
