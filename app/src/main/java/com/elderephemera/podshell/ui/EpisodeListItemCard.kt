@@ -11,6 +11,7 @@ import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import com.elderephemera.podshell.data.Episode
 import com.elderephemera.podshell.data.EpisodesRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class EpisodeListItemCard(
@@ -48,6 +49,12 @@ class EpisodeListItemCard(
             } else {
                 Icon(Icons.Filled.Add, contentDescription = "Add episode")
             }
+        }
+    }
+
+    override fun onLongClick(coroutineScope: CoroutineScope) {
+        coroutineScope.launch {
+            episodesRepository.updateEpisode(episode.copy(new = false))
         }
     }
 }
