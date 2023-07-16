@@ -27,7 +27,7 @@ class EpisodeListItemCard(
 
     override val title = episode.title
     override val url = episode.url
-    override val subtitle = "Published " + episode.pubDate
+    override val subtitle = "Published " + episode.pubDateDisplay
     override val description = episode.description
 
     @Composable

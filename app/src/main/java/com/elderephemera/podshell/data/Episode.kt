@@ -37,7 +37,9 @@ data class Episode(
     val pubDateTime: LocalDateTime? get() =
         try {
             LocalDateTime.parse(pubDate, DateTimeFormatter.RFC_1123_DATE_TIME)
-        } catch (e : DateTimeParseException) {
+        } catch (e: DateTimeParseException) {
             null
         }
+
+    val pubDateDisplay: String get() = pubDateTime?.toLocalDate()?.toString() ?: pubDate
 }
