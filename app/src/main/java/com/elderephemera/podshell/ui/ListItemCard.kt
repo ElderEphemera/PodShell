@@ -17,11 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
 import kotlinx.coroutines.CoroutineScope
@@ -75,7 +76,7 @@ interface ListItemCard {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = title,
-                            fontSize = 18.sp,
+                            fontSize = 18.xp,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = if (expanded) Int.MAX_VALUE else 2,
                             minLines = 2,
@@ -83,7 +84,7 @@ interface ListItemCard {
                         val uriHandler = LocalUriHandler.current
                         Text(
                             text = url,
-                            fontSize = 13.sp,
+                            fontSize = 13.xp,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = if (expanded) Int.MAX_VALUE else 1,
                             textDecoration = TextDecoration.Underline,
@@ -92,7 +93,7 @@ interface ListItemCard {
                         )
                         Text(
                             text = subtitle,
-                            fontSize = 13.sp,
+                            fontSize = 13.xp,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = if (expanded) Int.MAX_VALUE else 1,
                         )
@@ -122,6 +123,7 @@ interface ListItemCard {
                         ellipsize = TextUtils.TruncateAt.END
                         maxLines = if (expanded) Int.MAX_VALUE else 1
                         setTextColor(onSurface)
+                        textSize = 13f
                     }
                 },
                 update = {
@@ -145,3 +147,5 @@ fun List<ListItemCard>.ItemCardList() = LazyColumn(
         it.Content()
     }
 }
+
+val Int.xp: TextUnit @Composable get() = with(LocalDensity.current) { this@xp.dp.toSp() }
