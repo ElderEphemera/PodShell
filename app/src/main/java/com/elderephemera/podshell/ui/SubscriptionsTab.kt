@@ -145,7 +145,7 @@ class SubscriptionsTab(
                         .padding(10.dp)
                 )
                 val episodes by listDialogEpisodes.collectAsState(listOf())
-                episodes.map {
+                episodes.sortedByDescending { it.pubDateTime }.map {
                     EpisodeListItemCard(it, episodesRepository, showLogo = false)
                 }.ItemCardList()
             }
