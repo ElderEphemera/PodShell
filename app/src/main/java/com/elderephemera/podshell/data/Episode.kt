@@ -3,6 +3,9 @@ package com.elderephemera.podshell.data
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 @Entity(
     tableName = "episodes",
@@ -30,4 +33,11 @@ data class Episode(
     val url: String,
     val pubDate: String,
     val description: String,
-)
+) {
+    val pubDateTime: LocalDateTime? get() =
+        try {
+            LocalDateTime.parse(pubDate, DateTimeFormatter.RFC_1123_DATE_TIME)
+        } catch (e : DateTimeParseException) {
+            null
+        }
+}

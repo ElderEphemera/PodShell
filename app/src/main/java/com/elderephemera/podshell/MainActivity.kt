@@ -53,10 +53,12 @@ class MainActivity : ComponentActivity() {
                 ) {
                     controller?.let { player ->
                         val pagerState = rememberPagerState(0)
+                        val scaffoldState = rememberScaffoldState()
                         val tabs = listOf(
                             PlaylistTab(
                                 appContainer.feedsRepository,
                                 appContainer.episodesRepository,
+                                scaffoldState.snackbarHostState,
                                 player,
                             ),
                             NewEpisodesTab(
@@ -70,6 +72,7 @@ class MainActivity : ComponentActivity() {
                         )
                         val animationScope = rememberCoroutineScope()
                         Scaffold(
+                            scaffoldState = scaffoldState,
                             topBar = {
                                 TabBar(tabs, pagerState.currentPage) {
                                     animationScope.launch {
