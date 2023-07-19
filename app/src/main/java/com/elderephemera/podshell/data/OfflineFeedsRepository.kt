@@ -2,6 +2,9 @@ package com.elderephemera.podshell.data
 
 import com.prof.rssparser.Parser
 import kotlinx.coroutines.flow.first
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 class OfflineFeedsRepository(
     private val feedDao: FeedDao,
@@ -41,7 +44,7 @@ class OfflineFeedsRepository(
                 inPlaylist = old?.inPlaylist ?: false,
                 new = old?.new ?: markNew,
                 position = old?.position,
-                length = old?.length,
+                length = parseDuration(article.itunesArticleData?.duration) ?: old?.length,
                 logo = article.image ?: feed.logo,
                 title = article.title ?: "",
                 url = article.link ?: url,
@@ -55,6 +58,15 @@ class OfflineFeedsRepository(
             }
         }
     }
+
+    private fun parseDuration(durationString: String?): Long? = durationString
+        ?.split(":")
+        ?.reversed()
+        ?.zip(listOf(DurationUnit.SECONDS, DurationUnit.MINUTES, DurationUnit.HOURS))
+        { part, unit -> part.toIntOrNull()?.toDuration(unit) }
+        ?.filterNotNull()
+        ?.fold(Duration.ZERO, Duration::plus)
+        ?.inWholeMilliseconds
 
     override suspend fun deleteFeed(feed: Feed) = feedDao.delete(feed)
 }
