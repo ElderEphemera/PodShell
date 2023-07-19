@@ -18,11 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
@@ -152,5 +150,3 @@ fun List<ListItemCard>.ItemCardList() = LazyColumn(
         it.Content()
     }
 }
-
-val Int.xp: TextUnit @Composable get() = with(LocalDensity.current) { this@xp.dp.toSp() }

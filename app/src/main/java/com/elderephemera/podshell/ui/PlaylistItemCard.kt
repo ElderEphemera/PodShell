@@ -2,17 +2,18 @@ package com.elderephemera.podshell.ui
 
 import android.net.Uri
 import androidx.annotation.OptIn
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
@@ -72,7 +73,26 @@ class PlaylistItemCard(
     }
 
     @Composable
-    override fun ActionButton() {
+    override fun ActionButton() = Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = episode.lengthDisplay,
+            fontSize = 13.xp,
+            maxLines = 1,
+            overflow = TextOverflow.Clip,
+        )
+        ActionButtonCenter()
+        Text(
+            text = episode.pubDateDisplay,
+            fontSize = 13.xp,
+            maxLines = 1,
+            overflow = TextOverflow.Clip,
+        )
+    }
+
+    @Composable
+    private fun ActionButtonCenter() = Box(contentAlignment = Alignment.Center) {
         val context = LocalContext.current
 
         val downloadRequest: DownloadRequest =

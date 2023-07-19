@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import kotlin.time.Duration.Companion.milliseconds
 
 @Entity(
     tableName = "episodes",
@@ -42,4 +43,11 @@ data class Episode(
         }
 
     val pubDateDisplay: String get() = pubDateTime?.toLocalDate()?.toString() ?: pubDate
+
+    val lengthDisplay: String get() = length
+        ?.milliseconds
+        ?.toComponents { hours, minutes, _, _ ->
+            (if (hours != 0L) "${hours}h" else "") + "${minutes}m"
+        }
+        ?: ""
 }
