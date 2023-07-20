@@ -53,6 +53,8 @@ class PlaylistItemCard(
         }
     }
 
+    override val key = episode.id
+
     override val showLogo = true
     @Composable
     override fun Logo() = AsyncImage(

@@ -19,6 +19,8 @@ class EpisodeListItemCard(
     private val episodesRepository: EpisodesRepository,
     override val showLogo: Boolean,
 ) : ListItemCard {
+    override val key = episode.id
+
     @Composable
     override fun Logo() = AsyncImage(
         model = episode.logo,

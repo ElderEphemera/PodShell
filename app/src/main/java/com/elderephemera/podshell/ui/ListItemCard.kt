@@ -27,6 +27,8 @@ import androidx.core.text.HtmlCompat
 import kotlinx.coroutines.CoroutineScope
 
 interface ListItemCard {
+    val key: Long
+
     val showLogo: Boolean
     @Composable
     fun Logo()
@@ -146,7 +148,7 @@ fun List<ListItemCard>.ItemCardList() = LazyColumn(
         .fillMaxSize()
         .padding(10.dp)
 ) {
-    items(this@ItemCardList) {
+    items(this@ItemCardList, key = ListItemCard::key) {
         it.Content()
     }
 }

@@ -17,6 +17,8 @@ class FeedListItemCard(
     private val openList: () -> Unit,
     private val unsubscribe: () -> Unit,
 ) : ListItemCard {
+    override val key = feed.id
+
     override val showLogo = true
     @Composable
     override fun Logo() = AsyncImage(
