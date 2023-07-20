@@ -26,13 +26,12 @@ class PlayerService : MediaSessionService() {
         ).build()
     }
 
-    private lateinit var episodesRepository: EpisodesRepository
     private lateinit var session: MediaSession
 
     override fun onCreate() {
         super.onCreate()
 
-        episodesRepository = AppDataContainer(this).episodesRepository
+        val episodesRepository = AppDataContainer(this).episodesRepository
 
         val player = ExoPlayer.Builder(this)
             .setMediaSourceFactory(
@@ -41,7 +40,7 @@ class PlayerService : MediaSessionService() {
                 )
             )
             .build()
-            .apply { addListener(updateTimePlayerListener) }
+            .apply { addListener(updateTimePlayerListener(episodesRepository)) }
 
         session = MediaSession.Builder(this, player)
             .setCallback(object : MediaSession.Callback {
@@ -64,7 +63,7 @@ class PlayerService : MediaSessionService() {
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo) = session
 
-    private val updateTimePlayerListener =
+    private fun updateTimePlayerListener(episodesRepository: EpisodesRepository) =
         object : Player.Listener {
             private val timer = Timer()
             private var timerTask: TimerTask? = null
