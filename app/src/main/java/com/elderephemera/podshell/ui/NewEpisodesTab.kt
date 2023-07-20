@@ -1,21 +1,20 @@
 package com.elderephemera.podshell.ui
 
+import android.content.Intent
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import com.elderephemera.podshell.RefreshService
 import com.elderephemera.podshell.data.EpisodesRepository
-import com.elderephemera.podshell.data.FeedsRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 class NewEpisodesTab(
-    private val feedsRepository: FeedsRepository,
     private val episodesRepository: EpisodesRepository,
 ) : AppTab {
     override val title = "NEW"
@@ -29,14 +28,12 @@ class NewEpisodesTab(
 
     @Composable
     override fun Fab() {
-        val coroutineScope = rememberCoroutineScope()
+        val context = LocalContext.current
         FloatingActionButton(
             onClick = {
-                coroutineScope.launch {
-                    feedsRepository.getAllFeeds().first().forEach { feed ->
-                        feedsRepository.updateFeed(feed.id, feed.rss, markNew = true)
-                    }
-                }
+                val intent = Intent(context, RefreshService::class.java)
+                context.startService(intent)
+                ContextCompat.startForegroundService(context, intent)
             },
             backgroundColor = MaterialTheme.colors.primary,
             content = { Icon(Icons.Filled.Refresh, contentDescription = "Refresh feeds") },
