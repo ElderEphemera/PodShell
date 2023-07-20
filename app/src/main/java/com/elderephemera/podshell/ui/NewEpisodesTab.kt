@@ -32,7 +32,6 @@ class NewEpisodesTab(
         FloatingActionButton(
             onClick = {
                 val intent = Intent(context, RefreshService::class.java)
-                context.startService(intent)
                 ContextCompat.startForegroundService(context, intent)
             },
             backgroundColor = MaterialTheme.colors.primary,
