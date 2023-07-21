@@ -102,7 +102,7 @@ class PlayerService : MediaSessionService() {
             ): ImmutableList<CommandButton> = ImmutableList.of(
                 CommandButton.Builder()
                     .setPlayerCommand(Player.COMMAND_SEEK_BACK)
-                    .setIconResId(android.R.drawable.ic_media_rew)
+                    .setIconResId(R.drawable.fast_rewind)
                     .setExtras(Bundle().apply {
                         putInt(COMMAND_KEY_COMPACT_VIEW_INDEX, 0)
                     })
@@ -111,8 +111,8 @@ class PlayerService : MediaSessionService() {
                 CommandButton.Builder()
                     .setPlayerCommand(Player.COMMAND_PLAY_PAUSE)
                     .setIconResId(
-                        if (showPauseButton) android.R.drawable.ic_media_pause
-                        else android.R.drawable.ic_media_play
+                        if (showPauseButton) R.drawable.pause
+                        else R.drawable.play_arrow
                     )
                     .setExtras(Bundle().apply {
                         putInt(COMMAND_KEY_COMPACT_VIEW_INDEX, 1)
@@ -121,7 +121,7 @@ class PlayerService : MediaSessionService() {
                     .build(),
                 CommandButton.Builder()
                     .setPlayerCommand(Player.COMMAND_SEEK_FORWARD)
-                    .setIconResId(android.R.drawable.ic_media_ff)
+                    .setIconResId(R.drawable.fast_forward)
                     .setExtras(Bundle().apply {
                         putInt(COMMAND_KEY_COMPACT_VIEW_INDEX, 2)
                     })
