@@ -21,7 +21,9 @@ class RefreshService : Service() {
     private val job = SupervisorJob()
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val feedsRepository = AppDataContainer(this).feedsRepository
+        val appContainer = AppDataContainer(this)
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         ensureNotificationChannel(
             channelId = CHANNEL_ID,
@@ -29,36 +31,48 @@ class RefreshService : Service() {
             descriptionText = "Status of refreshing feeds",
             importance = NotificationManager.IMPORTANCE_LOW,
         )
-        val notification = createNotification("feeds", total = 0, completed = 0)
-        startForeground(NOTIFICATION_ID, notification)
+        startForeground(
+            NOTIFICATION_ID,
+            createProgressNotification("feeds", total = 0, completed = 0)
+        )
 
         CoroutineScope(Dispatchers.IO + job).launch {
-            val feeds = feedsRepository.getAllFeeds().first()
+            val feeds = appContainer.feedsRepository.getAllFeeds().first()
             feeds.forEachIndexed { idx, feed ->
-                postNotification(feed.title, total = feeds.size, completed = idx)
-                feedsRepository.updateFeed(feed.id, feed.rss, markNew = true)
+                notificationManager.notify(
+                    NOTIFICATION_ID,
+                    createProgressNotification(feed.title, total = feeds.size, completed = idx)
+                )
+                appContainer.feedsRepository.updateFeed(feed.id, feed.rss, markNew = true)
             }
 
-            stopForeground(STOP_FOREGROUND_REMOVE)
+            val new = appContainer.episodesRepository.getAllNewEpisodes().first()
+            if (new.isEmpty()) {
+                stopForeground(STOP_FOREGROUND_REMOVE)
+            } else {
+                notificationManager.notify(NOTIFICATION_ID, createFinishedNotification(new.size))
+                stopForeground(STOP_FOREGROUND_DETACH)
+            }
+
             stopSelf()
         }
 
         return START_NOT_STICKY
     }
 
-    private fun createNotification(feedTitle: String, total: Int, completed: Int) =
+    private fun createProgressNotification(feedTitle: String, total: Int, completed: Int) =
         NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Refreshing $feedTitle...")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setProgress(total, completed, false)
             .build()
 
-    private fun postNotification(feedTitle: String, total: Int, completed: Int) {
-        val notification = createNotification(feedTitle, total, completed)
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(NOTIFICATION_ID, notification)
-    }
+    private fun createFinishedNotification(newCount: Int) =
+        NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("New episodes: $newCount")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentIntent(mainActivityPendingIntent())
+            .build()
 
     override fun onDestroy() {
         super.onDestroy()
