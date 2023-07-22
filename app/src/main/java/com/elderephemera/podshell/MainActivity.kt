@@ -35,6 +35,11 @@ class MainActivity : ComponentActivity() {
     @androidx.annotation.OptIn(UnstableApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (intent.extras?.getInt("tab") == 1) {
+            RefreshService.cancelNotification(this)
+        }
+
         val appContainer = AppDataContainer(applicationContext)
 
         val sessionToken =
@@ -78,6 +83,9 @@ class MainActivity : ComponentActivity() {
                                 TabBar(tabs, pagerState.currentPage) {
                                     animationScope.launch {
                                         pagerState.animateScrollToPage(it, 0F)
+                                    }
+                                    if (it == 1) {
+                                        RefreshService.cancelNotification(this)
                                     }
                                 }
                             },

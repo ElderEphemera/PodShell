@@ -28,6 +28,12 @@ class RefreshService : Service() {
 
         private const val WORKER_TAG = "refresh"
 
+        fun cancelNotification(context: Context) {
+            val notificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.cancel(NOTIFICATION_ID)
+        }
+
         fun ensureRefreshScheduled(context: Context) {
             val workManager = WorkManager.getInstance(context)
             val workInfosFuture = workManager.getWorkInfosByTag(WORKER_TAG)
