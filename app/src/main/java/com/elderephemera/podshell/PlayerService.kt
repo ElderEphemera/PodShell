@@ -1,10 +1,7 @@
 package com.elderephemera.podshell
 
-import android.app.PendingIntent
-import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.OptIn
-import androidx.core.app.TaskStackBuilder
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -46,17 +43,8 @@ class PlayerService : MediaSessionService() {
             .build()
             .apply { addListener(updateTimePlayerListener(episodesRepository)) }
 
-        val activityIntent = Intent(this, MainActivity::class.java)
-        val activityPendingIntent = TaskStackBuilder.create(this).run {
-            addNextIntentWithParentStack(activityIntent)
-            getPendingIntent(
-                0,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )!! // "May return null only if PendingIntent.FLAG_NO_CREATE has been supplied"
-        }
-
         session = MediaSession.Builder(this, player)
-            .setSessionActivity(activityPendingIntent)
+            .setSessionActivity(mainActivityPendingIntent())
             .setCallback(object : MediaSession.Callback {
                 override fun onConnect(
                     session: MediaSession,

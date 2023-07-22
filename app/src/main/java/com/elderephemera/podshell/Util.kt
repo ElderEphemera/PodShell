@@ -2,8 +2,11 @@ package com.elderephemera.podshell
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
+import androidx.core.app.TaskStackBuilder
 
 fun Context.ensureNotificationChannel(
     channelId: String,
@@ -23,5 +26,16 @@ fun Context.ensureNotificationChannel(
         }
 
         notificationManager.createNotificationChannel(channel)
+    }
+}
+
+fun Context.mainActivityPendingIntent(): PendingIntent {
+    val intent = Intent(this, MainActivity::class.java)
+    return TaskStackBuilder.create(this).run {
+        addNextIntentWithParentStack(intent)
+        getPendingIntent(
+            0,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )!! // "May return null only if PendingIntent.FLAG_NO_CREATE has been supplied"
     }
 }
