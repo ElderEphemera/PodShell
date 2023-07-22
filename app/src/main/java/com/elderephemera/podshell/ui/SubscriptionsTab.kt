@@ -9,11 +9,13 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.elderephemera.podshell.RefreshService
 import com.elderephemera.podshell.data.Episode
 import com.elderephemera.podshell.data.EpisodesRepository
 import com.elderephemera.podshell.data.Feed
@@ -57,6 +59,7 @@ class SubscriptionsTab(
     private var showAddFeedDialog by mutableStateOf(false)
     @Composable
     private fun AddFeedDialog() {
+        val context = LocalContext.current
         val coroutineScope = rememberCoroutineScope()
         AnimatedVisibility(visible = showAddFeedDialog) {
             Dialog(
@@ -84,6 +87,7 @@ class SubscriptionsTab(
                                 coroutineScope.launch {
                                     val feedId = feedsRepository.insertFeed(feedUrl)
                                     feedsRepository.updateFeed(feedId, feedUrl, markNew = false)
+                                    RefreshService.ensureRefreshScheduled(context)
                                 }
                                 showAddFeedDialog = false
                             },

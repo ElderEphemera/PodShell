@@ -5,17 +5,54 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import androidx.work.ListenableWorker
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
 import com.elderephemera.podshell.data.AppDataContainer
+import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.toJavaDuration
 
 class RefreshService : Service() {
     companion object {
         const val NOTIFICATION_ID = 2
         const val CHANNEL_ID = "refresh"
+
+        private const val WORKER_TAG = "refresh"
+
+        fun ensureRefreshScheduled(context: Context) {
+            val workManager = WorkManager.getInstance(context)
+            val workInfosFuture = workManager.getWorkInfosByTag(WORKER_TAG)
+            workInfosFuture.addListener(
+                {
+                    if (workInfosFuture.get().isEmpty()) {
+                        workManager.enqueue(
+                            PeriodicWorkRequestBuilder<RefreshWorker>(1.hours.toJavaDuration())
+                                .addTag(WORKER_TAG)
+                                .build()
+                        )
+                    }
+                },
+                ContextCompat.getMainExecutor(context)
+            )
+        }
+
+        class RefreshWorker(private val context: Context, workerParams: WorkerParameters)
+            : ListenableWorker(context, workerParams) {
+            override fun startWork(): ListenableFuture<Result> {
+                val intent = Intent(context, RefreshService::class.java)
+                ContextCompat.startForegroundService(context, intent)
+                return Futures.immediateFuture(Result.success())
+            }
+        }
     }
 
     private val job = SupervisorJob()
