@@ -40,6 +40,8 @@ class PlayerService : MediaSessionService() {
                     DownloadsSingleton.getInstance(this).cacheDataSourceFactory
                 )
             )
+            .setSeekBackIncrementMs(30_000)
+            .setSeekForwardIncrementMs(30_000)
             .build()
             .apply { addListener(updateTimePlayerListener(episodesRepository)) }
 
