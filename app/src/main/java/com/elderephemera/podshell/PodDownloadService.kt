@@ -1,10 +1,7 @@
 package com.elderephemera.podshell
 
 import android.app.Notification
-import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
-import android.os.Build
 import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
@@ -24,22 +21,12 @@ class PodDownloadService : DownloadService(FOREGROUND_NOTIFICATION_ID) {
 
     override fun onCreate() {
         super.onCreate()
-        createNotificationChannel()
-    }
-
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Downloads"
-            val descriptionText = "Ongoing podcast downloads"
-            val importance = NotificationManager.IMPORTANCE_LOW
-            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-                description = descriptionText
-            }
-
-            val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
+        ensureNotificationChannel(
+            channelId = CHANNEL_ID,
+            name = "Downloads",
+            descriptionText = "Ongoing podcast downloads",
+            importance = NotificationManager.IMPORTANCE_LOW,
+        )
     }
 
     public override fun getDownloadManager(): DownloadManager =

@@ -1,17 +1,15 @@
 package com.elderephemera.podshell
 
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.elderephemera.podshell.data.AppDataContainer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class RefreshService : Service() {
@@ -25,7 +23,12 @@ class RefreshService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val feedsRepository = AppDataContainer(this).feedsRepository
 
-        createNotificationChannel()
+        ensureNotificationChannel(
+            channelId = CHANNEL_ID,
+            name = "Refresh",
+            descriptionText = "Status of refreshing feeds",
+            importance = NotificationManager.IMPORTANCE_LOW,
+        )
         val notification = createNotification("feeds", total = 0, completed = 0)
         startForeground(NOTIFICATION_ID, notification)
 
@@ -41,21 +44,6 @@ class RefreshService : Service() {
         }
 
         return START_NOT_STICKY
-    }
-
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "Refresh"
-            val descriptionText = "Status of refreshing feeds"
-            val importance = NotificationManager.IMPORTANCE_LOW
-            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-                description = descriptionText
-            }
-
-            val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
     }
 
     private fun createNotification(feedTitle: String, total: Int, completed: Int) =
