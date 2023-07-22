@@ -20,7 +20,11 @@ class RefreshService : Service() {
 
     private val job = SupervisorJob()
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int
+    ): Int = synchronized(this) {
         val appContainer = AppDataContainer(this)
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
