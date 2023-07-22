@@ -52,7 +52,9 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     controller?.let { player ->
-                        val pagerState = rememberPagerState(0)
+                        val pagerState = rememberPagerState(
+                            initialPage = intent.extras?.getInt("tab") ?: 0
+                        )
                         val scaffoldState = rememberScaffoldState()
                         val tabs = listOf(
                             PlaylistTab(

@@ -29,8 +29,10 @@ fun Context.ensureNotificationChannel(
     }
 }
 
-fun Context.mainActivityPendingIntent(): PendingIntent {
-    val intent = Intent(this, MainActivity::class.java)
+fun Context.mainActivityPendingIntent(tab: Int = 0): PendingIntent {
+    val intent = Intent(this, MainActivity::class.java).apply {
+        putExtra("tab", tab)
+    }
     return TaskStackBuilder.create(this).run {
         addNextIntentWithParentStack(intent)
         getPendingIntent(

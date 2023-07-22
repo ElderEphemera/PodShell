@@ -112,7 +112,7 @@ class RefreshService : Service() {
         NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("New episodes: $newCount")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentIntent(mainActivityPendingIntent())
+            .setContentIntent(mainActivityPendingIntent(tab = 1))
             .build()
 
     override fun onDestroy() {
