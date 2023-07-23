@@ -112,9 +112,6 @@ class PlaylistItemCard(
         contentAlignment = Alignment.Center,
         modifier = modifier
     ) {
-        val iconSize = 35.dp
-        val progressSize = 45.dp
-
         val context = LocalContext.current
 
         val downloadRequest: DownloadRequest =
@@ -131,19 +128,19 @@ class PlaylistItemCard(
                 CircularProgressIndicator(
                     download.percentDownloaded/100,
                     backgroundColor = MaterialTheme.colors.primary.copy(alpha = .3f),
-                    modifier = Modifier.size(progressSize)
+                    modifier = Modifier.size(abProgressSize)
                 )
             } else {
                 CircularProgressIndicator(
                     backgroundColor = MaterialTheme.colors.primary.copy(alpha = .3f),
-                    modifier = Modifier.size(progressSize)
+                    modifier = Modifier.size(abProgressSize)
                 )
             }
             Icon(
                 Icons.Filled.Download,
                 contentDescription = "Downloading",
                 tint = MaterialTheme.colors.onPrimary.copy(alpha = .5f),
-                modifier = Modifier.size(iconSize)
+                modifier = Modifier.size(abIconSize)
             )
         } else if (
             DownloadsSingleton.getInstance(context)
@@ -156,13 +153,13 @@ class PlaylistItemCard(
                 CircularProgressIndicator(
                     player.currentPosition.toFloat()/player.duration,
                     backgroundColor = MaterialTheme.colors.primary.copy(alpha = .25f),
-                    modifier = Modifier.size(progressSize)
+                    modifier = Modifier.size(abProgressSize)
                 )
             } else if (episode.position != null && episode.length != null) {
                 CircularProgressIndicator(
                     episode.position.toFloat()/episode.length,
                     backgroundColor = MaterialTheme.colors.primary.copy(alpha = .25f),
-                    modifier = Modifier.size(progressSize)
+                    modifier = Modifier.size(abProgressSize)
                 )
             }
 
@@ -171,7 +168,7 @@ class PlaylistItemCard(
                     Icon(
                         Icons.Filled.Pause,
                         contentDescription = "Pause",
-                        modifier = Modifier.size(iconSize)
+                        modifier = Modifier.size(abIconSize)
                     )
                 }
             } else {
@@ -201,7 +198,7 @@ class PlaylistItemCard(
                     Icon(
                         Icons.Filled.PlayArrow,
                         contentDescription = "Play",
-                        modifier = Modifier.size(iconSize)
+                        modifier = Modifier.size(abIconSize)
                     )
                 }
             }
@@ -217,7 +214,7 @@ class PlaylistItemCard(
                 Icon(
                     Icons.Filled.Download,
                     contentDescription = "Download",
-                    modifier = Modifier.size(iconSize)
+                    modifier = Modifier.size(abIconSize)
                 )
             }
         }

@@ -1,5 +1,6 @@
 package com.elderephemera.podshell.ui
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
@@ -7,6 +8,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import com.elderephemera.podshell.data.Episode
@@ -47,9 +49,17 @@ class EpisodeListItemCard(
             },
         ) {
             if (episode.inPlaylist) {
-                Icon(Icons.Filled.Delete, contentDescription = "Delete episode")
+                Icon(
+                    Icons.Filled.Delete,
+                    contentDescription = "Delete episode",
+                    modifier = Modifier.size(abIconSize)
+                )
             } else {
-                Icon(Icons.Filled.Add, contentDescription = "Add episode")
+                Icon(
+                    Icons.Filled.Add,
+                    contentDescription = "Add episode",
+                    modifier = Modifier.size(abIconSize)
+                )
             }
         }
     }

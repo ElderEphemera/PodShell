@@ -1,10 +1,12 @@
 package com.elderephemera.podshell.ui
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import com.elderephemera.podshell.data.Feed
@@ -45,6 +47,10 @@ class FeedListItemCard(
 
     @Composable
     override fun ActionButton() = IconButton(onClick = openList) {
-        Icon(Icons.Filled.List, contentDescription = "Show feed episodes")
+        Icon(
+            Icons.Filled.List,
+            contentDescription = "Show feed episodes",
+            modifier = Modifier.size(abIconSize)
+        )
     }
 }
