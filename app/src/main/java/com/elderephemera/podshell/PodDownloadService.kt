@@ -39,7 +39,7 @@ class PodDownloadService : DownloadService(FOREGROUND_NOTIFICATION_ID) {
         notMetRequirements: Int
     ): Notification = DownloadNotificationHelper(this, CHANNEL_ID).buildProgressNotification(
         this,
-        R.drawable.ic_launcher_foreground,
+        R.drawable.ic_notification,
         null,
         null,
         downloads,

@@ -110,14 +110,14 @@ class RefreshService : Service() {
     private fun createProgressNotification(feedTitle: String, total: Int, completed: Int) =
         NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Refreshing $feedTitle...")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_notification)
             .setProgress(total, completed, false)
             .build()
 
     private fun createFinishedNotification(newCount: Int) =
         NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("New episodes: $newCount")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentIntent(mainActivityPendingIntent(tab = 1))
             .build()
 

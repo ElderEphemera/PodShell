@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="48.0px"
+   height="48.0px"
+   viewBox="0 0 48.0 48.0"
+   version="1.1"
+   id="SVGRoot"
+   sodipodi:docname="icon_foreground.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview20408"
+     pagecolor="#808080"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     showgrid="false"
+     inkscape:zoom="16"
+     inkscape:cx="11.96875"
+     inkscape:cy="22.34375"
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     showguides="true">
+    <inkscape:grid
+       type="xygrid"
+       id="grid20414" />
+    <sodipodi:guide
+       position="0,48"
+       orientation="0,48"
+       id="guide23378"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="48,48"
+       orientation="48,0"
+       id="guide23380"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="48,0"
+       orientation="0,-48"
+       id="guide23382"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="0,0"
+       orientation="-48,0"
+       id="guide23384"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <defs
+     id="defs20403">
+    <inkscape:path-effect
+       effect="powermask"
+       id="path-effect31628"
+       is_visible="true"
+       lpeversion="1"
+       uri="#mask-powermask-path-effect31628"
+       invert="false"
+       hide_mask="false"
+       background="true"
+       background_color="#ffffffff" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path28381"
+       mask="none"
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       d="M 35.896099 36.121205 C 40.539586 30.146819 41.088511 21.500412 36.531359 15.314272 C 31.867179 8.9828473 22.598914 6.9362057 16.157359 11.759428 C 10.995417 15.624517 9.3382384 23.244706 13.343289 28.494824 C 16.494855 32.626129 22.654008 33.941698 26.852349 30.669284 C 30.084955 28.14962 31.105226 23.273172 28.48401 19.993874 C 26.518678 17.535126 22.757206 16.767541 20.271319 18.814727 C 18.468849 20.299106 17.912929 23.107382 19.458752 24.918225 C 20.531209 26.174548 22.530483 26.552656 23.777213 25.440356 C 24.589877 24.715322 24.829646 23.387252 24.088317 22.601267 C 23.869656 22.36943 23.532789 22.20557 23.222449 22.17486 C 22.912106 22.144146 22.657381 22.217043 22.446866 22.430487 A 0.75 0.75 0 0 1 21.386287 22.438101 A 0.75 0.75 0 0 1 21.378673 21.377522 C 21.928971 20.819567 22.684678 20.614565 23.370386 20.682434 C 24.056092 20.750297 24.700123 21.063043 25.179354 21.571145 C 26.571038 23.046665 26.159164 25.324496 24.774702 26.559675 C 22.831776 28.2931 19.891441 27.73318 18.317678 25.889607 C 16.17355 23.377879 16.913884 19.635744 19.316254 17.657336 C 22.506468 15.030121 27.20337 15.987036 29.65663 19.056213 C 32.25417 22.305889 31.92311 26.765522 29.626172 29.929598 L 35.896099 36.121205 z M 34.567927 36.918543 L 32.43154 34.808262 C 27.128581 39.671372 19.268746 40.561749 12.988675 36.935948 L 11.487547 39.533551 C 18.936276 43.834075 28.311254 42.741449 34.567927 36.918543 z M 31.146879 33.541006 L 29.007229 31.427462 C 25.246485 34.738207 19.777808 35.313218 15.389391 32.779565 L 13.889351 35.37608 C 19.446651 38.584589 26.429809 37.810559 31.146879 33.541006 z "
+       transform="matrix(-0.89776264,-0.89776264,0.89776264,-0.89776264,21.46783,69.058742)" />
+  </g>
+</svg>
