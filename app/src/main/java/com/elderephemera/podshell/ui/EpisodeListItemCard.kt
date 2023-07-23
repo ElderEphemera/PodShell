@@ -1,8 +1,10 @@
 package com.elderephemera.podshell.ui
 
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -38,6 +40,15 @@ class EpisodeListItemCard(
     @Composable
     override fun ActionButton() {
         val coroutineScope = rememberCoroutineScope()
+
+        if (episode.position != null && episode.length != null) {
+            CircularProgressIndicator(
+                episode.position.toFloat()/episode.length,
+                backgroundColor = MaterialTheme.colors.primary.copy(alpha = .25f),
+                modifier = Modifier.size(abProgressSize)
+            )
+        }
+
         IconButton(
             onClick = {
                 coroutineScope.launch {
