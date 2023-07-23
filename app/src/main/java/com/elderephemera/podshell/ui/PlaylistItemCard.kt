@@ -3,7 +3,8 @@ package com.elderephemera.podshell.ui
 import android.net.Uri
 import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
@@ -11,9 +12,12 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
@@ -75,26 +79,42 @@ class PlaylistItemCard(
     }
 
     @Composable
-    override fun ActionButton() = Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+    override fun ActionButton() = ConstraintLayout {
+        val (topText, centerBox, bottomText) = createRefs()
+
+        ActionButtonCenter(
+            modifier = Modifier.constrainAs(centerBox) {}.fillMaxSize()
+        )
         Text(
             text = episode.lengthDisplay,
             fontSize = 13.xp,
             maxLines = 1,
             overflow = TextOverflow.Clip,
+            modifier = Modifier.constrainAs(topText) {
+                centerHorizontallyTo(parent)
+                top.linkTo(parent.top, 3.dp)
+            }
         )
-        ActionButtonCenter()
         Text(
             text = episode.pubDateDisplay,
             fontSize = 13.xp,
             maxLines = 1,
             overflow = TextOverflow.Clip,
+            modifier = Modifier.constrainAs(bottomText) {
+                centerHorizontallyTo(parent)
+                bottom.linkTo(parent.bottom, 3.dp)
+            }
         )
     }
 
     @Composable
-    private fun ActionButtonCenter() = Box(contentAlignment = Alignment.Center) {
+    private fun ActionButtonCenter(modifier: Modifier) = Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+    ) {
+        val iconSize = 35.dp
+        val progressSize = 45.dp
+
         val context = LocalContext.current
 
         val downloadRequest: DownloadRequest =
@@ -111,16 +131,19 @@ class PlaylistItemCard(
                 CircularProgressIndicator(
                     download.percentDownloaded/100,
                     backgroundColor = MaterialTheme.colors.primary.copy(alpha = .3f),
+                    modifier = Modifier.size(progressSize)
                 )
             } else {
                 CircularProgressIndicator(
                     backgroundColor = MaterialTheme.colors.primary.copy(alpha = .3f),
+                    modifier = Modifier.size(progressSize)
                 )
             }
             Icon(
                 Icons.Filled.Download,
                 contentDescription = "Downloading",
                 tint = MaterialTheme.colors.onPrimary.copy(alpha = .5f),
+                modifier = Modifier.size(iconSize)
             )
         } else if (
             DownloadsSingleton.getInstance(context)
@@ -133,17 +156,23 @@ class PlaylistItemCard(
                 CircularProgressIndicator(
                     player.currentPosition.toFloat()/player.duration,
                     backgroundColor = MaterialTheme.colors.primary.copy(alpha = .25f),
+                    modifier = Modifier.size(progressSize)
                 )
             } else if (episode.position != null && episode.length != null) {
                 CircularProgressIndicator(
                     episode.position.toFloat()/episode.length,
                     backgroundColor = MaterialTheme.colors.primary.copy(alpha = .25f),
+                    modifier = Modifier.size(progressSize)
                 )
             }
 
             if (player.isPlaying && player.currentMediaItem?.mediaId == episode.guid) {
                 IconButton(onClick = player::pause) {
-                    Icon(Icons.Filled.Pause, contentDescription = "Pause")
+                    Icon(
+                        Icons.Filled.Pause,
+                        contentDescription = "Pause",
+                        modifier = Modifier.size(iconSize)
+                    )
                 }
             } else {
                 IconButton(onClick = {
@@ -169,7 +198,11 @@ class PlaylistItemCard(
                     }
                     player.play()
                 }) {
-                    Icon(Icons.Filled.PlayArrow, contentDescription = "Play")
+                    Icon(
+                        Icons.Filled.PlayArrow,
+                        contentDescription = "Play",
+                        modifier = Modifier.size(iconSize)
+                    )
                 }
             }
         } else {
@@ -181,7 +214,11 @@ class PlaylistItemCard(
                     false,
                 )
             }) {
-                Icon(Icons.Filled.Download, contentDescription = "Download")
+                Icon(
+                    Icons.Filled.Download,
+                    contentDescription = "Download",
+                    modifier = Modifier.size(iconSize)
+                )
             }
         }
     }
