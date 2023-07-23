@@ -77,6 +77,8 @@ class SubscriptionsTab(
                         value = feedUrl,
                         onValueChange = { feedUrl = it },
                         placeholder = { Text(text = "Paste feed URL here") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
                     )
                     Box(
                         modifier = Modifier.fillMaxWidth(),
