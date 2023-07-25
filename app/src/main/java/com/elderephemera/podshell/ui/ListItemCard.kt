@@ -18,12 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
+import com.elderephemera.podshell.vibrateClick
 import kotlinx.coroutines.CoroutineScope
 
 interface ListItemCard {
@@ -46,6 +48,7 @@ interface ListItemCard {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun Content() {
+        val context = LocalContext.current
         val coroutineScope = rememberCoroutineScope()
         Column(
             modifier = Modifier
@@ -61,7 +64,10 @@ interface ListItemCard {
                         .weight(1f)
                         .combinedClickable(
                             onClick = { expanded = !expanded },
-                            onLongClick = { onLongClick(coroutineScope) }
+                            onLongClick = {
+                                vibrateClick(context)
+                                onLongClick(coroutineScope)
+                            }
                         )
                         .padding(5.dp)
                 ) {

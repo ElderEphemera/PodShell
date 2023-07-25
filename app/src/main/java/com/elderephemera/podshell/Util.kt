@@ -4,8 +4,13 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
+import android.content.Context.VIBRATOR_MANAGER_SERVICE
+import android.content.Context.VIBRATOR_SERVICE
 import android.content.Intent
 import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import androidx.core.app.TaskStackBuilder
 
 fun Context.ensureNotificationChannel(
@@ -39,5 +44,21 @@ fun Context.mainActivityPendingIntent(tab: Int = 0): PendingIntent {
             0,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )!! // "May return null only if PendingIntent.FLAG_NO_CREATE has been supplied"
+    }
+}
+
+fun vibrateClick(context: Context) {
+    val vibrator = if (Build.VERSION.SDK_INT >= 31) {
+        (context.getSystemService(VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
+    } else {
+        @Suppress("DEPRECATION")
+        context.getSystemService(VIBRATOR_SERVICE) as Vibrator
+    }
+
+    if (Build.VERSION.SDK_INT >= 29) {
+        vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))
+    } else {
+        @Suppress("DEPRECATION")
+        vibrator.vibrate(200)
     }
 }
