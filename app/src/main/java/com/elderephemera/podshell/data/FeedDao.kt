@@ -17,6 +17,9 @@ interface FeedDao {
     @Update
     suspend fun update(feed: Feed)
 
+    @Query("UPDATE feeds SET error = :error WHERE id = :id")
+    suspend fun setError(id: Long, error: String)
+
     @Delete
     suspend fun delete(feed: Feed)
 }

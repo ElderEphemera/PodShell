@@ -40,6 +40,8 @@ interface ListItemCard {
     val subtitle: String
     val description: String
 
+    val hasError get() = false
+
     @Composable
     fun ActionButton()
 
@@ -104,6 +106,9 @@ interface ListItemCard {
                             fontSize = 13.xp,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = if (expanded) Int.MAX_VALUE else 1,
+                            color =
+                                if (hasError) MaterialTheme.colors.error
+                                else MaterialTheme.colors.onSurface
                         )
                     }
                 }

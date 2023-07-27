@@ -14,4 +14,5 @@ data class Feed(
     val url: String,
     val description: String,
     val refreshed: Long = Instant.now().epochSecond,
+    val error: String? = null,
 )

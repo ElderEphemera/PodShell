@@ -33,7 +33,8 @@ class FeedListItemCard(
 
     override val title = feed.title
     override val url = feed.url
-    override val subtitle = (Instant.now().epochSecond - feed.refreshed).seconds.toComponents {
+    override val subtitle = feed.error ?:
+    (Instant.now().epochSecond - feed.refreshed).seconds.toComponents {
         days, hours, minutes, _, _ ->
         if (days == 1L) "Refreshed 1 day ago"
         else if (days != 0L) "Refreshed $days days ago"
@@ -44,6 +45,8 @@ class FeedListItemCard(
         else "Refreshed just now"
     }
     override val description = feed.description
+
+    override val hasError = feed.error != null
 
     @Composable
     override fun ActionButton() = IconButton(onClick = openList) {

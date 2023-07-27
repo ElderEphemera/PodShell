@@ -24,7 +24,10 @@ class OfflineFeedsRepository(
 
     private val parser = Parser.Builder().build()
     override suspend fun updateFeed(id: Long, url: String, markNew: Boolean) {
-        val channel = parser.getChannel(url)
+        val channel = try { parser.getChannel(url) } catch (e: Exception) {
+            feedDao.setError(id, error = "Refresh failed: ${e.message ?: "Unknown error"}")
+            return
+        }
         val feed = Feed(
             id = id,
             rss = url,
