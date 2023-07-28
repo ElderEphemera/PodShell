@@ -54,6 +54,8 @@ class PlaylistTab(
         DATE_NEWEST(display = "date (newest first)", DATE_OLDEST.comparator.reversed()),
         FEED(display = "feed", compareBy { it.feedId }),
         TITLE(display = "title", compareBy { it.title }),
+        LENGTH_SHORTEST(display = "length (shortest first)", compareBy { it.length } ),
+        LENGTH_LONGEST(display = "length (longest first)", LENGTH_SHORTEST.comparator.reversed()),
         ;
 
         val message = "Sorted by $display"
