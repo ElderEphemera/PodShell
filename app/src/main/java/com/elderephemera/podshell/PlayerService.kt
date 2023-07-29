@@ -42,6 +42,7 @@ class PlayerService : MediaSessionService() {
             )
             .setSeekBackIncrementMs(30_000)
             .setSeekForwardIncrementMs(30_000)
+            .setHandleAudioBecomingNoisy(true)
             .build()
             .apply { addListener(updateTimePlayerListener(episodesRepository)) }
 
