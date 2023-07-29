@@ -19,6 +19,8 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import androidx.media3.ui.LegacyPlayerControlView
+import coil.Coil
+import coil.ImageLoader
 import com.elderephemera.podshell.data.AppDataContainer
 import com.elderephemera.podshell.ui.AppTab
 import com.elderephemera.podshell.ui.NewEpisodesTab
@@ -49,6 +51,11 @@ class MainActivity : ComponentActivity() {
             { controller = controllerFuture.get() },
             ContextCompat.getMainExecutor(this)
         )
+
+        val imageLoader = ImageLoader.Builder(this)
+            .respectCacheHeaders(enable = false)
+            .build()
+        Coil.setImageLoader(imageLoader)
 
         setContent {
             PodShellTheme {
