@@ -101,7 +101,7 @@ fun PlayerButtons(
 ) {
     val iconSize = 35.dp
 
-    IconButton(onClick = {}) {
+    IconButton(onClick = preferencesDialog()) {
         Icon(
             Icons.Filled.Settings,
             contentDescription = "Preferences",
