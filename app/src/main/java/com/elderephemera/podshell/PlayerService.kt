@@ -2,6 +2,7 @@ package com.elderephemera.podshell
 
 import android.os.Bundle
 import androidx.annotation.OptIn
+import androidx.media3.common.AudioAttributes
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -43,6 +44,7 @@ class PlayerService : MediaSessionService() {
             .setSeekBackIncrementMs(30_000)
             .setSeekForwardIncrementMs(30_000)
             .setHandleAudioBecomingNoisy(true)
+            .setAudioAttributes(AudioAttributes.DEFAULT, true)
             .build()
             .apply { addListener(updateTimePlayerListener(episodesRepository)) }
 
