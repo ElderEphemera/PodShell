@@ -11,10 +11,10 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.C
 import androidx.media3.common.Player
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
@@ -22,8 +22,6 @@ fun PlayerControls(player: Player) = Column(
     modifier = Modifier
         .background(MaterialTheme.colors.surface)
 ) {
-    val iconSize = 35.dp
-
     var currentPosition by remember { mutableStateOf(0L) }
     var duration by remember { mutableStateOf(C.TIME_UNSET) }
     var hasMediaItem by remember { mutableStateOf(false) }
@@ -44,45 +42,17 @@ fun PlayerControls(player: Player) = Column(
     }
 
     Timeline(currentPosition, duration, hasMediaItem, player::seekTo)
-    Row(modifier = Modifier.padding(10.dp, 0.dp, 10.dp, 5.dp)) {
-        Text(currentPosition.milliseconds.formatHMS, color = MaterialTheme.colors.onSurface)
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
-            modifier = Modifier.weight(1f, fill = true)
-        ) {
-            IconButton(onClick = { player.seekBack() }, enabled = hasMediaItem) {
-                Icon(
-                    Icons.Filled.FastRewind,
-                    contentDescription = "Skip Back",
-                    modifier = Modifier.size(iconSize)
-                )
-            }
-            if (isPlaying) {
-                IconButton(onClick = { player.pause() }, enabled = hasMediaItem) {
-                    Icon(
-                        Icons.Filled.Pause,
-                        contentDescription = "Pause",
-                        modifier = Modifier.size(iconSize)
-                    )
-                }
-            } else {
-                IconButton(onClick = { player.play() }, enabled = hasMediaItem) {
-                    Icon(
-                        Icons.Filled.PlayArrow,
-                        contentDescription = "Play",
-                        modifier = Modifier.size(iconSize)
-                    )
-                }
-            }
-            IconButton(onClick = { player.seekForward() }, enabled = hasMediaItem) {
-                Icon(
-                    Icons.Filled.FastForward,
-                    contentDescription = "Skip Forward",
-                    modifier = Modifier.size(iconSize)
-                )
-            }
-        }
-        Text(duration.milliseconds.formatHMS, color = MaterialTheme.colors.onSurface)
+
+    Box(
+        contentAlignment = Alignment.TopCenter,
+        modifier = Modifier.padding(10.dp, 0.dp, 10.dp, 5.dp)
+    ) {
+        Timestamp(currentPosition, align = TextAlign.Left)
+        PlayerButtons(
+            player::seekBack, player::pause, player::play, player::seekForward,
+            hasMediaItem, isPlaying,
+        )
+        Timestamp(duration, align = TextAlign.Right)
     }
 }
 
@@ -107,8 +77,60 @@ fun Timeline(
     )
 }
 
-val Duration.formatHMS: String get() = toComponents { hours, minutes, seconds, _ ->
-    if (this.isNegative()) "0:00"
-    else if (hours > 0L) "%d:%02d:%02d".format(hours, minutes, seconds)
-    else "%d:%02d".format(minutes, seconds)
+@Composable
+fun Timestamp(timeMs: Long, align: TextAlign) = Text(
+    timeMs.milliseconds.toComponents { hours, minutes, seconds, _ ->
+        if (timeMs == C.TIME_UNSET) "0:00"
+        else if (hours > 0L) "%d:%02d:%02d".format(hours, minutes, seconds)
+        else "%d:%02d".format(minutes, seconds)
+    },
+    color = MaterialTheme.colors.onSurface,
+    textAlign = align,
+    modifier = Modifier.fillMaxWidth()
+)
+
+@Composable
+fun PlayerButtons(
+    seekBack: () -> Unit,
+    pause: () -> Unit,
+    play: () -> Unit,
+    seekForward: () -> Unit,
+    hasMediaItem: Boolean,
+    isPlaying: Boolean,
+) = Row(
+    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+) {
+    val iconSize = 35.dp
+
+    IconButton(onClick = seekBack, enabled = hasMediaItem) {
+        Icon(
+            Icons.Filled.FastRewind,
+            contentDescription = "Skip Back",
+            modifier = Modifier.size(iconSize)
+        )
+    }
+    if (isPlaying) {
+        IconButton(onClick = pause, enabled = hasMediaItem) {
+            Icon(
+                Icons.Filled.Pause,
+                contentDescription = "Pause",
+                modifier = Modifier.size(iconSize)
+            )
+        }
+    } else {
+        IconButton(onClick = play, enabled = hasMediaItem) {
+            Icon(
+                Icons.Filled.PlayArrow,
+                contentDescription = "Play",
+                modifier = Modifier.size(iconSize)
+            )
+        }
+    }
+    IconButton(onClick = seekForward, enabled = hasMediaItem) {
+        Icon(
+            Icons.Filled.FastForward,
+            contentDescription = "Skip Forward",
+            modifier = Modifier.size(iconSize)
+        )
+    }
 }
