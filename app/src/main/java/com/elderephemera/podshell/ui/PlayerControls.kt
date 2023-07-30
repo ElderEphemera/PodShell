@@ -4,10 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FastForward
-import androidx.compose.material.icons.filled.FastRewind
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +47,7 @@ fun PlayerControls(player: Player) = Column(
         Timestamp(currentPosition, align = TextAlign.Left)
         PlayerButtons(
             player::seekBack, player::pause, player::play, player::seekForward,
+            stop = player::clearMediaItems,
             hasMediaItem, isPlaying,
         )
         Timestamp(duration, align = TextAlign.Right)
@@ -95,6 +93,7 @@ fun PlayerButtons(
     pause: () -> Unit,
     play: () -> Unit,
     seekForward: () -> Unit,
+    stop: () -> Unit,
     hasMediaItem: Boolean,
     isPlaying: Boolean,
 ) = Row(
@@ -102,6 +101,13 @@ fun PlayerButtons(
 ) {
     val iconSize = 35.dp
 
+    IconButton(onClick = {}) {
+        Icon(
+            Icons.Filled.Settings,
+            contentDescription = "Preferences",
+            modifier = Modifier.size(iconSize)
+        )
+    }
     IconButton(onClick = seekBack, enabled = hasMediaItem) {
         Icon(
             Icons.Filled.FastRewind,
@@ -130,6 +136,13 @@ fun PlayerButtons(
         Icon(
             Icons.Filled.FastForward,
             contentDescription = "Skip Forward",
+            modifier = Modifier.size(iconSize)
+        )
+    }
+    IconButton(onClick = stop, enabled = hasMediaItem) {
+        Icon(
+            Icons.Filled.Stop,
+            contentDescription = "Stop",
             modifier = Modifier.size(iconSize)
         )
     }
