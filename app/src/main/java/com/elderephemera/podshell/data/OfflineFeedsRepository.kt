@@ -48,7 +48,7 @@ class OfflineFeedsRepository(
                 new = old?.new ?: markNew,
                 position = old?.position,
                 length = parseDuration(article.itunesArticleData?.duration) ?: old?.length,
-                logo = article.image ?: feed.logo,
+                logo = article.image ?: article.itunesArticleData?.image ?: feed.logo,
                 title = article.title ?: "",
                 url = article.link ?: url,
                 pubDate = article.pubDate ?: "unknown",
