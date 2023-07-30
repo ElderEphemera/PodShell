@@ -38,6 +38,8 @@ fun PlayerControls(player: Player) = Column(
         onDispose { player.removeListener(listener) }
     }
 
+    val openPreferencesDialog = preferencesDialog()
+
     Timeline(currentPosition, duration, hasMediaItem, player::seekTo)
 
     Box(
@@ -48,6 +50,7 @@ fun PlayerControls(player: Player) = Column(
         PlayerButtons(
             player::seekBack, player::pause, player::play, player::seekForward,
             stop = player::clearMediaItems,
+            openPreferencesDialog,
             hasMediaItem, isPlaying,
         )
         Timestamp(duration, align = TextAlign.Right)
@@ -94,6 +97,7 @@ fun PlayerButtons(
     play: () -> Unit,
     seekForward: () -> Unit,
     stop: () -> Unit,
+    openPreferencesDialog: () -> Unit,
     hasMediaItem: Boolean,
     isPlaying: Boolean,
 ) = Row(
@@ -101,7 +105,7 @@ fun PlayerButtons(
 ) {
     val iconSize = 35.dp
 
-    IconButton(onClick = preferencesDialog()) {
+    IconButton(onClick = openPreferencesDialog) {
         Icon(
             Icons.Filled.Settings,
             contentDescription = "Preferences",
