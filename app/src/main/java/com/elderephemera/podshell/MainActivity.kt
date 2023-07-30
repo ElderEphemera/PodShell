@@ -13,19 +13,14 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
-import androidx.media3.ui.LegacyPlayerControlView
 import coil.Coil
 import coil.ImageLoader
 import com.elderephemera.podshell.data.AppDataContainer
-import com.elderephemera.podshell.ui.AppTab
-import com.elderephemera.podshell.ui.NewEpisodesTab
-import com.elderephemera.podshell.ui.PlaylistTab
-import com.elderephemera.podshell.ui.SubscriptionsTab
+import com.elderephemera.podshell.ui.*
 import com.elderephemera.podshell.ui.theme.PodShellTheme
 import kotlinx.coroutines.launch
 import java.util.*
@@ -97,12 +92,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             },
                             bottomBar = {
-                                AndroidView(factory = {
-                                    LegacyPlayerControlView(it).apply {
-                                        setPlayer(player)
-                                        showTimeoutMs = 0
-                                    }
-                                })
+                                PlayerControls(player)
                             },
                         ) { padding ->
                             Box(modifier = Modifier
