@@ -94,6 +94,7 @@ class MainActivity : ComponentActivity() {
                             bottomBar = {
                                 PlayerControls(player)
                             },
+                            floatingActionButton = { tabs[pagerState.currentPage].Fab() }
                         ) { padding ->
                             Box(modifier = Modifier
                                 .fillMaxSize()

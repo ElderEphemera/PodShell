@@ -21,7 +21,6 @@ interface AppTab {
     @Composable
     fun Content() = Scaffold(
         modifier = Modifier.fillMaxSize(),
-        floatingActionButton = { Fab() },
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             val listItems by listItems().collectAsState(listOf())
