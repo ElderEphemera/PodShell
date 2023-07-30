@@ -40,23 +40,6 @@ class PlaylistItemCard(
     private val player: Player,
     private val episodesRepository: EpisodesRepository,
 ) : ListItemCard {
-    companion object {
-        private fun Player.seekToOnReady(positionMs: Long) {
-            if (availableCommands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM)) {
-                seekTo(positionMs)
-            } else {
-                addListener(object : Player.Listener {
-                    override fun onAvailableCommandsChanged(availableCommands: Player.Commands) {
-                        if (availableCommands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM)) {
-                            seekTo(positionMs)
-                            removeListener(this)
-                        }
-                    }
-                })
-            }
-        }
-    }
-
     override val key = episode.id
 
     override val showLogo = true
@@ -181,17 +164,15 @@ class PlaylistItemCard(
                             .setArtist(feed.title)
                             .setArtworkUri(episode.logo?.let(Uri::parse))
                             .build()
+                        val position =
+                            if (episode.position != null &&
+                                episode.length != null &&
+                                episode.position < episode.length) episode.position
+                            else 0
                         player.setMediaItem(downloadMediaItem.buildUpon()
                             .setMediaMetadata(metadata)
-                            .build())
+                            .build(), position)
                         player.prepare()
-                        episode.position?.let {
-                            if (episode.length != null && it < episode.length) {
-                                player.seekToOnReady(it)
-                            } else {
-                                player.seekToOnReady(0)
-                            }
-                        }
                     }
                     player.play()
                 }) {
