@@ -22,10 +22,10 @@ fun PlayerControls(player: Player) = Column(
     modifier = Modifier
         .background(MaterialTheme.colors.surface)
 ) {
-    var currentPosition by remember { mutableStateOf(0L) }
-    var duration by remember { mutableStateOf(C.TIME_UNSET) }
-    var hasMediaItem by remember { mutableStateOf(false) }
-    var isPlaying by remember { mutableStateOf(false) }
+    var currentPosition by remember { mutableStateOf(player.currentPosition) }
+    var duration by remember { mutableStateOf(player.duration) }
+    var hasMediaItem by remember { mutableStateOf(player.currentMediaItem != null) }
+    var isPlaying by remember { mutableStateOf(player.isPlaying) }
 
     DisposableEffect(key1 = Unit) {
         val listener = object : Player.Listener {
