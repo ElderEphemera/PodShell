@@ -40,6 +40,7 @@ class PlaylistTab(
         FloatingActionButton(
             onClick = {
                 sortingOrder = sortingOrders[(sortingOrder.ordinal+1) % sortingOrders.size]
+                snackbarHostState.currentSnackbarData?.dismiss()
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(sortingOrder.message)
                 }
