@@ -2,6 +2,7 @@ package com.elderephemera.podshell.ui
 
 import android.text.TextUtils
 import android.text.method.LinkMovementMethod
+import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.widget.TextView
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -137,7 +138,7 @@ interface ListItemCard {
                         maxLines = if (expanded) Int.MAX_VALUE else 1
                         setTextColor(onSurface)
                         setLinkTextColor(linkColor.toArgb())
-                        textSize = 13f
+                        setTextSize(COMPLEX_UNIT_DIP, 16f)
                         linksClickable = true
                         movementMethod = LinkMovementMethod.getInstance()
                     }
