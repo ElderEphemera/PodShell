@@ -3,6 +3,7 @@ package com.elderephemera.podshell.ui
 import android.text.TextUtils
 import android.text.method.LinkMovementMethod
 import android.util.TypedValue.COMPLEX_UNIT_DIP
+import android.util.TypedValue.COMPLEX_UNIT_SP
 import android.widget.TextView
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -26,6 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
+import com.elderephemera.podshell.prefOverrideTextSize
 import com.elderephemera.podshell.vibrateClick
 import kotlinx.coroutines.CoroutineScope
 
@@ -130,6 +132,10 @@ interface ListItemCard {
             }
             Divider(color = MaterialTheme.colors.background)
             val onSurface = MaterialTheme.colors.onSurface.toArgb()
+            val overrideTextSize by context.prefOverrideTextSize.state()
+            val textUnit by remember { derivedStateOf {
+                if (overrideTextSize) COMPLEX_UNIT_DIP else COMPLEX_UNIT_SP
+            }}
             AndroidView(
                 factory = { context ->
                     TextView(context).apply {
@@ -138,7 +144,7 @@ interface ListItemCard {
                         maxLines = if (expanded) Int.MAX_VALUE else 1
                         setTextColor(onSurface)
                         setLinkTextColor(linkColor.toArgb())
-                        setTextSize(COMPLEX_UNIT_DIP, 16f)
+                        setTextSize(textUnit, 16f)
                         linksClickable = true
                         movementMethod = LinkMovementMethod.getInstance()
                     }
@@ -146,6 +152,7 @@ interface ListItemCard {
                 update = {
                     it.text = HtmlCompat.fromHtml(description, HtmlCompat.FROM_HTML_MODE_LEGACY)
                     it.maxLines = if (expanded) Int.MAX_VALUE else 1
+                    it.setTextSize(textUnit, 16f)
                 },
                 modifier = Modifier.padding(5.dp)
             )

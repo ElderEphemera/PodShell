@@ -2,15 +2,18 @@ package com.elderephemera.podshell.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.elderephemera.podshell.prefOverrideTextSize
+import kotlinx.coroutines.launch
 
 @Composable
 fun preferencesDialog(): () -> Unit {
@@ -36,6 +39,33 @@ fun preferencesDialog(): () -> Unit {
                     backgroundColor = MaterialTheme.colors.primary,
                     contentColor = MaterialTheme.colors.onPrimary,
                 )
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(15.dp)
+                ) {
+                    Row {
+                        val coroutineScope = rememberCoroutineScope()
+                        val pref = LocalContext.current.prefOverrideTextSize
+                        val value by pref.state()
+                        Column(modifier = Modifier.weight(1f, fill = true)) {
+                            Text(
+                                text = "Override system font size",
+                                fontSize = 18.xp,
+                            )
+                            Text(
+                                text = "Don't scale text according to the system font size setting",
+                                fontSize = 13.xp,
+                            )
+                        }
+                        Checkbox(
+                            checked = value,
+                            onCheckedChange = {
+                                coroutineScope.launch { pref.set(it) }
+                            },
+                            modifier = Modifier.offset(x = 15.dp)
+                        )
+                    }
+                }
             }
         }
     }
