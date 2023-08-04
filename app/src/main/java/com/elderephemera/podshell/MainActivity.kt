@@ -53,7 +53,8 @@ class MainActivity : ComponentActivity() {
         Coil.setImageLoader(imageLoader)
 
         setContent {
-            PodShellTheme {
+            val overrideTextSize by prefOverrideTextSize.state()
+            PodShellTheme(overrideTextSize = overrideTextSize) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background

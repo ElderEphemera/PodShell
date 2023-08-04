@@ -33,7 +33,11 @@ private val LightColorPalette = lightColors(
 )
 
 @Composable
-fun PodShellTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
+fun PodShellTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    overrideTextSize: Boolean,
+    content: @Composable () -> Unit,
+) {
     val colors = if (darkTheme) {
         DarkColorPalette
     } else {
@@ -42,7 +46,7 @@ fun PodShellTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composab
 
     MaterialTheme(
         colors = colors,
-        typography = Typography,
+        typography = if (overrideTextSize) Typography.overrideTextSize() else Typography,
         shapes = Shapes,
         content = content
     )

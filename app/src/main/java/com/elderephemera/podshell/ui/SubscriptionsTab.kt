@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.elderephemera.podshell.RefreshService
@@ -72,7 +71,7 @@ class SubscriptionsTab(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     var feedUrl by remember { mutableStateOf("") }
-                    Text(text = "Add Subscription", fontSize = 20.sp)
+                    Text(text = "Add Subscription", style = MaterialTheme.typography.subtitle1)
                     TextField(
                         value = feedUrl,
                         onValueChange = { feedUrl = it },

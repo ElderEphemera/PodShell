@@ -25,8 +25,8 @@ import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import coil.compose.AsyncImage
-import com.elderephemera.podshell.PodDownloadService
 import com.elderephemera.podshell.DownloadsSingleton
+import com.elderephemera.podshell.PodDownloadService
 import com.elderephemera.podshell.data.Episode
 import com.elderephemera.podshell.data.EpisodesRepository
 import com.elderephemera.podshell.data.Feed
@@ -70,7 +70,7 @@ class PlaylistItemCard(
         )
         Text(
             text = episode.lengthDisplay,
-            fontSize = 13.xp,
+            style = MaterialTheme.typography.caption,
             maxLines = 1,
             overflow = TextOverflow.Clip,
             modifier = Modifier.constrainAs(topText) {
@@ -80,7 +80,7 @@ class PlaylistItemCard(
         )
         Text(
             text = episode.pubDateDisplay,
-            fontSize = 13.xp,
+            style = MaterialTheme.typography.caption,
             maxLines = 1,
             overflow = TextOverflow.Clip,
             modifier = Modifier.constrainAs(bottomText) {

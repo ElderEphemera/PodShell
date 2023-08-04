@@ -50,11 +50,11 @@ fun preferencesDialog(): () -> Unit {
                         Column(modifier = Modifier.weight(1f, fill = true)) {
                             Text(
                                 text = "Override system font size",
-                                fontSize = 18.xp,
+                                style = MaterialTheme.typography.subtitle1,
                             )
                             Text(
                                 text = "Don't scale text according to the system font size setting",
-                                fontSize = 13.xp,
+                                style = MaterialTheme.typography.subtitle2,
                             )
                         }
                         Checkbox(

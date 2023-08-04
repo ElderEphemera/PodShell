@@ -2,8 +2,6 @@ package com.elderephemera.podshell.ui
 
 import android.text.TextUtils
 import android.text.method.LinkMovementMethod
-import android.util.TypedValue.COMPLEX_UNIT_DIP
-import android.util.TypedValue.COMPLEX_UNIT_SP
 import android.widget.TextView
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -27,7 +25,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
-import com.elderephemera.podshell.prefOverrideTextSize
 import com.elderephemera.podshell.vibrateClick
 import kotlinx.coroutines.CoroutineScope
 
@@ -89,7 +86,7 @@ interface ListItemCard {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = title,
-                            fontSize = 18.xp,
+                            style = MaterialTheme.typography.subtitle1,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = if (expanded) Int.MAX_VALUE else 2,
                             minLines = 2,
@@ -97,7 +94,7 @@ interface ListItemCard {
                         val uriHandler = LocalUriHandler.current
                         Text(
                             text = url,
-                            fontSize = 13.xp,
+                            style = MaterialTheme.typography.subtitle2,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = if (expanded) Int.MAX_VALUE else 1,
                             textDecoration = TextDecoration.Underline,
@@ -106,7 +103,7 @@ interface ListItemCard {
                         )
                         Text(
                             text = subtitle,
-                            fontSize = 13.xp,
+                            style = MaterialTheme.typography.subtitle2,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = if (expanded) Int.MAX_VALUE else 1,
                             color =
@@ -132,10 +129,7 @@ interface ListItemCard {
             }
             Divider(color = MaterialTheme.colors.background)
             val onSurface = MaterialTheme.colors.onSurface.toArgb()
-            val overrideTextSize by context.prefOverrideTextSize.state()
-            val textUnit by remember { derivedStateOf {
-                if (overrideTextSize) COMPLEX_UNIT_DIP else COMPLEX_UNIT_SP
-            }}
+            val fontSize = MaterialTheme.typography.body1.fontSize.value
             AndroidView(
                 factory = { context ->
                     TextView(context).apply {
@@ -144,7 +138,7 @@ interface ListItemCard {
                         maxLines = if (expanded) Int.MAX_VALUE else 1
                         setTextColor(onSurface)
                         setLinkTextColor(linkColor.toArgb())
-                        setTextSize(textUnit, 16f)
+                        textSize = fontSize
                         linksClickable = true
                         movementMethod = LinkMovementMethod.getInstance()
                     }
@@ -152,7 +146,7 @@ interface ListItemCard {
                 update = {
                     it.text = HtmlCompat.fromHtml(description, HtmlCompat.FROM_HTML_MODE_LEGACY)
                     it.maxLines = if (expanded) Int.MAX_VALUE else 1
-                    it.setTextSize(textUnit, 16f)
+                    it.textSize = fontSize
                 },
                 modifier = Modifier.padding(5.dp)
             )
