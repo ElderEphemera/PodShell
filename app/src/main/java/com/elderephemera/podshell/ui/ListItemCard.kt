@@ -12,11 +12,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
+import com.elderephemera.podshell.ui.theme.linkColor
 import com.elderephemera.podshell.vibrateClick
 import kotlinx.coroutines.CoroutineScope
 
@@ -49,7 +50,7 @@ interface ListItemCard {
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    fun Content() {
+    fun Content() = Surface(elevation = 5.dp) {
         val context = LocalContext.current
         val coroutineScope = rememberCoroutineScope()
         Column(
@@ -58,7 +59,7 @@ interface ListItemCard {
                 .fillMaxWidth()
         ) {
             var expanded by remember { mutableStateOf(false) }
-            val linkColor = Color(0xFF64B5F6)
+            val linkColor = linkColor()
             Row(modifier = Modifier.height(IntrinsicSize.Min)) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(5.dp),
