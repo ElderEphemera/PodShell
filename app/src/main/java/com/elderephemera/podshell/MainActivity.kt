@@ -54,7 +54,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val overrideTextSize by prefOverrideTextSize.state()
-            PodShellTheme(overrideTextSize = overrideTextSize) {
+            val themeType by prefThemeType.state()
+            PodShellTheme(
+                darkTheme = themeType.isDark,
+                overrideTextSize = overrideTextSize,
+            ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background

@@ -1,6 +1,5 @@
 package com.elderephemera.podshell.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
@@ -34,20 +33,12 @@ private val LightColorPalette = lightColors(
 
 @Composable
 fun PodShellTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean,
     overrideTextSize: Boolean,
     content: @Composable () -> Unit,
-) {
-    val colors = if (darkTheme) {
-        DarkColorPalette
-    } else {
-        LightColorPalette
-    }
-
-    MaterialTheme(
-        colors = colors,
-        typography = if (overrideTextSize) Typography.overrideTextSize() else Typography,
-        shapes = Shapes,
-        content = content
-    )
-}
+) = MaterialTheme(
+    colors = if (darkTheme) DarkColorPalette else LightColorPalette,
+    typography = if (overrideTextSize) Typography.overrideTextSize() else Typography,
+    shapes = Shapes,
+    content = content
+)
