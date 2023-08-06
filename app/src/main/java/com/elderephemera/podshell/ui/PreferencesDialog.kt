@@ -45,7 +45,8 @@ fun preferencesDialog(): () -> Unit {
                     backgroundColor = MaterialTheme.colors.primary,
                     contentColor = MaterialTheme.colors.onPrimary,
                 )
-                Column(modifier = Modifier.padding(8.dp)) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Header("Appearance")
                     PrefOverrideTextSize()
                     PrefOptions(
                         name = "Color Theme",
@@ -53,6 +54,8 @@ fun preferencesDialog(): () -> Unit {
                         options = ThemeType.values(),
                         display = { it.name },
                     )
+
+                    Header("Playback")
                     PrefOptions(
                         name = "Jump Forward Interval",
                         pref = LocalContext.current.prefSeekForwardIncrement,
@@ -71,6 +74,16 @@ fun preferencesDialog(): () -> Unit {
     }
 
     return { visible = true }
+}
+
+@Composable
+fun Header(text: String) = Column(modifier = Modifier.padding(vertical = 8.dp)) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.subtitle1,
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    Divider(color = MaterialTheme.colors.onBackground)
 }
 
 @Composable
