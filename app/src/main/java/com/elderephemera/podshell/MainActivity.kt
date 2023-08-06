@@ -4,6 +4,9 @@ import android.content.ComponentName
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.*
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,6 +15,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.media3.common.util.UnstableApi
@@ -100,7 +104,7 @@ class MainActivity : ComponentActivity() {
                             bottomBar = {
                                 PlayerControls(player)
                             },
-                            floatingActionButton = { tabs[pagerState.currentPage].Fab() }
+                            floatingActionButton = { Fab(tabs[pagerState.targetPage]) }
                         ) { padding ->
                             Box(modifier = Modifier
                                 .fillMaxSize()
@@ -117,6 +121,38 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         controller?.release()
         super.onDestroy()
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun Fab(tab: AppTab) {
+    val duration = 150
+    val delay = 100
+    val easing = FastOutSlowInEasing
+
+    AnimatedContent(
+        targetState = tab,
+        transitionSpec = {
+            ContentTransform(
+                targetContentEnter =
+                    expandIn(
+                        animationSpec = tween(duration, delay, easing),
+                        expandFrom = Alignment.Center,
+                        clip = false
+                    ) + fadeIn(tween(duration, delay, easing))
+                            ,
+                initialContentExit =
+                    shrinkOut(
+                        animationSpec = tween(duration, 0, easing),
+                        shrinkTowards = Alignment.Center,
+                        clip = false
+                    ) + fadeOut(tween(duration, 0, easing)),
+            )
+        },
+        contentAlignment = Alignment.Center,
+    ) {
+        it.Fab()
     }
 }
 
