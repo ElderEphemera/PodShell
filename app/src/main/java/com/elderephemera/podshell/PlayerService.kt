@@ -87,29 +87,36 @@ class PlayerService : MediaSessionService() {
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo) = session
 
     private fun updateTimePlayerListener(episodesRepository: EpisodesRepository) =
-        object : Player.Listener {
-            private val timer = Timer()
-            private var timerTask: TimerTask? = null
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                if (isPlaying) {
-                    val mediaId = session.player.currentMediaItem?.mediaId
-                    if (mediaId != null) {
-                        timerTask = timerTask {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                episodesRepository.updateEpisodeTime(
-                                    mediaId,
-                                    session.player.currentPosition,
-                                    session.player.duration
-                                )
-                            }
-                        }
-                        timer.scheduleAtFixedRate(timerTask, 0, 1000)
-                    }
-                } else {
-                    timerTask?.cancel()
+        object : UpdateTimePlayerListener(scope) {
+            override suspend fun updateTime() {
+                val mediaId = session.player.currentMediaItem?.mediaId
+                if (mediaId != null) {
+                    episodesRepository.updateEpisodeTime(
+                        mediaId,
+                        session.player.currentPosition,
+                        session.player.duration
+                    )
                 }
             }
         }
+
+    abstract class UpdateTimePlayerListener(private val scope: CoroutineScope) : Player.Listener {
+        private val timer = Timer()
+        private var timerTask: TimerTask? = null
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            if (isPlaying) {
+                timerTask = timerTask { scope.launch { updateTime() } }
+                timer.scheduleAtFixedRate(timerTask, 0, 1000)
+            } else {
+                cancel()
+            }
+        }
+
+        fun cancel() = timerTask?.cancel()
+
+        abstract suspend fun updateTime()
+    }
 
     @OptIn(UnstableApi::class)
     private fun mediaNotificationProvider() =
