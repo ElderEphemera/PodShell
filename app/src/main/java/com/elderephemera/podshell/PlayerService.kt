@@ -44,7 +44,6 @@ class PlayerService : MediaSessionService() {
                     DownloadsSingleton.getInstance(this).cacheDataSourceFactory
                 )
             )
-            .setHandleAudioBecomingNoisy(true)
             .setAudioAttributes(AudioAttributes.DEFAULT, true)
             .build()
             .apply { addListener(updateTimePlayerListener(episodesRepository)) }
@@ -55,6 +54,12 @@ class PlayerService : MediaSessionService() {
                 override fun seekBack() =
                     seekTo(currentPosition - seekBackIncrement.value)
             }}
+
+        scope.launch {
+            prefHandleAudioBecomingNoisy.flow.collect {
+                player.setHandleAudioBecomingNoisy(it)
+            }
+        }
 
         session = MediaSession.Builder(this, player)
             .setSessionActivity(mainActivityPendingIntent())

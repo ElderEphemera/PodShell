@@ -79,6 +79,12 @@ val Context.prefSeekBackIncrement get() = Pref.inDataStore(
     default = 10_000,
 )
 
+val Context.prefHandleAudioBecomingNoisy get() = Pref.inDataStore(
+    context = this,
+    key = booleanPreferencesKey("handle-become-noisy"),
+    default = true,
+)
+
 enum class ThemeType {
     System { override val isDark @Composable get() = isSystemInDarkTheme() },
     Light { override val isDark @Composable get() = false },

@@ -47,7 +47,11 @@ fun preferencesDialog(): () -> Unit {
                 )
                 Column(modifier = Modifier.padding(12.dp)) {
                     Header("Appearance")
-                    PrefOverrideTextSize()
+                    PrefCheckbox(
+                        name = "Override system font size",
+                        description = "Don't scale text according to the system font size setting",
+                        pref = LocalContext.current.prefOverrideTextSize
+                    )
                     PrefOptions(
                         name = "Color Theme",
                         pref = LocalContext.current.prefThemeType,
@@ -68,6 +72,11 @@ fun preferencesDialog(): () -> Unit {
                         options = jumpIntervals,
                         display = ::displayInterval
                     )
+                    PrefCheckbox(
+                        name = "Pause On Headphones Disconnect",
+                        description = "Pause playback when switching from a headset or bluetooth device to the internal speakers",
+                        pref = LocalContext.current.prefHandleAudioBecomingNoisy
+                    )
                 }
             }
         }
@@ -87,29 +96,23 @@ fun Header(text: String) = Column(modifier = Modifier.padding(vertical = 8.dp)) 
 }
 
 @Composable
-fun PrefOverrideTextSize() = Row(modifier = Modifier.padding(8.dp)) {
-    val coroutineScope = rememberCoroutineScope()
-    val pref = LocalContext.current.prefOverrideTextSize
-    val value by pref.state()
+fun PrefCheckbox(name: String, description: String, pref: Pref<Boolean>) =
+    Row(modifier = Modifier.padding(8.dp)) {
+        val coroutineScope = rememberCoroutineScope()
+        val value by pref.state()
 
-    Column(modifier = Modifier.weight(1f, fill = true)) {
-        Text(
-            text = "Override system font size",
-            style = MaterialTheme.typography.subtitle1,
-        )
-        Text(
-            text = "Don't scale text according to the system font size setting",
-            style = MaterialTheme.typography.subtitle2,
+        Column(modifier = Modifier.weight(1f, fill = true)) {
+            Text(text = name, style = MaterialTheme.typography.subtitle1)
+            Text(text = description, style = MaterialTheme.typography.subtitle2)
+        }
+        Checkbox(
+            checked = value,
+            onCheckedChange = {
+                coroutineScope.launch { pref.set(it) }
+            },
+            modifier = Modifier.offset(x = 15.dp)
         )
     }
-    Checkbox(
-        checked = value,
-        onCheckedChange = {
-            coroutineScope.launch { pref.set(it) }
-        },
-        modifier = Modifier.offset(x = 15.dp)
-    )
-}
 
 @Composable
 fun <T> PrefOptions(name: String, pref: Pref<T>, options: Array<T>, display: (T) -> String) = Box {
