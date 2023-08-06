@@ -50,7 +50,7 @@ fun preferencesDialog(): () -> Unit {
                 Column(modifier = Modifier.padding(12.dp)) {
                     Header("Appearance")
                     PrefCheckbox(
-                        name = "Override system font size",
+                        name = "Override System Font Size",
                         description = "Don't scale text according to the system font size setting",
                         pref = LocalContext.current.prefOverrideTextSize
                     )
