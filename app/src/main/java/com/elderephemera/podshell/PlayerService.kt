@@ -11,9 +11,7 @@ import androidx.media3.session.*
 import com.elderephemera.podshell.data.AppDataContainer
 import com.elderephemera.podshell.data.EpisodesRepository
 import com.google.common.collect.ImmutableList
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.util.*
 import kotlin.concurrent.timerTask
 
@@ -27,6 +25,8 @@ class PlayerService : MediaSessionService() {
         ).build()
     }
 
+    private val scope = MainScope()
+
     private lateinit var session: MediaSession
 
     @OptIn(UnstableApi::class)
@@ -35,18 +35,26 @@ class PlayerService : MediaSessionService() {
 
         val episodesRepository = AppDataContainer(this).episodesRepository
 
+        val seekForwardIncrement = prefSeekForwardIncrement.stateFlow(scope)
+        val seekBackIncrement = prefSeekBackIncrement.stateFlow(scope)
+
         val player = ExoPlayer.Builder(this)
             .setMediaSourceFactory(
                 DefaultMediaSourceFactory(this).setDataSourceFactory(
                     DownloadsSingleton.getInstance(this).cacheDataSourceFactory
                 )
             )
-            .setSeekBackIncrementMs(30_000)
-            .setSeekForwardIncrementMs(30_000)
             .setHandleAudioBecomingNoisy(true)
             .setAudioAttributes(AudioAttributes.DEFAULT, true)
             .build()
             .apply { addListener(updateTimePlayerListener(episodesRepository)) }
+            .let { object : ExoPlayer by it {
+                override fun seekForward() =
+                    seekTo(currentPosition + seekForwardIncrement.value)
+
+                override fun seekBack() =
+                    seekTo(currentPosition - seekBackIncrement.value)
+            }}
 
         session = MediaSession.Builder(this, player)
             .setSessionActivity(mainActivityPendingIntent())
@@ -67,6 +75,7 @@ class PlayerService : MediaSessionService() {
     override fun onDestroy() {
         session.player.release()
         session.release()
+        scope.cancel()
         super.onDestroy()
     }
 

@@ -3,56 +3,80 @@ package com.elderephemera.podshell
 import android.content.Context
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.*
 
 val Context.preferencesDataStore by preferencesDataStore(name = "preferences")
 
-class Pref<T, U>(
-    private val context: Context,
-    private val key: Preferences.Key<U>,
-    private val default: T,
-    private val encode: (T) -> U,
-    private val decode: (U) -> T,
-) {
+interface Pref<T> {
     companion object {
-        fun <T, U> build(
+        fun <T, U> inDataStore(
             context: Context,
             key: Preferences.Key<U>,
             default: T,
             encode: (T) -> U,
             decode: (U) -> T,
-        ) = Pref(context, key, default, encode, decode)
+        ) = DataStorePref(context, key, default, encode, decode)
 
-        fun <T> build(context: Context, key: Preferences.Key<T>, default: T) =
-            Pref(context, key, default, { it }, { it })
+        fun <T> inDataStore(context: Context, key: Preferences.Key<T>, default: T) =
+            DataStorePref(context, key, default, { it }, { it })
     }
 
-    val flow = context.preferencesDataStore.data.map { it[key]?.let(decode) ?: default }
+    val default: T
+
+    val flow: Flow<T>
+
+    fun stateFlow(scope: CoroutineScope): StateFlow<T> =
+        flow.stateIn(scope, SharingStarted.Eagerly, default)
 
     @Composable
-    fun state() = flow.collectAsState(initial = default)
+    fun state(): State<T> = flow.collectAsState(initial = default)
 
-    suspend fun set(value: T) = context.preferencesDataStore.edit { it[key] = encode(value) }
+    suspend fun set(value: T)
 }
 
-val Context.prefOverrideTextSize get() = Pref.build(
+class DataStorePref<T, U>(
+    private val context: Context,
+    private val key: Preferences.Key<U>,
+    override val default: T,
+    private val encode: (T) -> U,
+    private val decode: (U) -> T,
+) : Pref<T> {
+    override val flow = context.preferencesDataStore.data.map { it[key]?.let(decode) ?: default }
+
+    override suspend fun set(value: T) {
+        context.preferencesDataStore.edit { it[key] = encode(value) }
+    }
+}
+
+val Context.prefOverrideTextSize get() = Pref.inDataStore(
     context = this,
     key = booleanPreferencesKey("override-text-size"),
     default = false,
 )
 
-val Context.prefThemeType get() = Pref.build(
+val Context.prefThemeType get() = Pref.inDataStore(
     context = this,
     key = intPreferencesKey("theme-type"),
     default = ThemeType.System,
     encode = { it.ordinal },
     decode = { ThemeType.values()[it] }
+)
+
+val Context.prefSeekForwardIncrement get() = Pref.inDataStore(
+    context = this,
+    key = longPreferencesKey("seek-forward-increment"),
+    default = 30_000,
+)
+
+val Context.prefSeekBackIncrement get() = Pref.inDataStore(
+    context = this,
+    key = longPreferencesKey("seek-back-increment"),
+    default = 10_000,
 )
 
 enum class ThemeType {
