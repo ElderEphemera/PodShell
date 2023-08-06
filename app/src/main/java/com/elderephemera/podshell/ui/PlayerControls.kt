@@ -25,16 +25,15 @@ fun PlayerControls(player: Player) = Column(
     var currentPosition by remember { mutableStateOf(player.currentPosition) }
     var duration by remember { mutableStateOf(player.duration) }
     var hasMediaItem by remember { mutableStateOf(player.currentMediaItem != null) }
-    var isPlayingNow by remember { mutableStateOf(player.isPlaying) }
+    var isPlaying by remember { mutableStateOf(player.isPlaying) }
 
     DisposableEffect(key1 = Unit) {
         val listener = object : PlayerService.UpdateTimePlayerListener(scope) {
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
+            override fun onEvents(player: Player, events: Player.Events) {
                 currentPosition = player.currentPosition
                 duration = player.duration
                 hasMediaItem = player.currentMediaItem != null
-                isPlayingNow = isPlaying
-                super.onIsPlayingChanged(isPlaying)
+                isPlaying = player.isPlaying
             }
 
             override suspend fun updateTime() {
@@ -63,7 +62,7 @@ fun PlayerControls(player: Player) = Column(
             player::seekBack, player::pause, player::play, player::seekForward,
             stop = player::clearMediaItems,
             openPreferencesDialog,
-            hasMediaItem, isPlayingNow,
+            hasMediaItem, isPlaying,
         )
         Timestamp(duration, align = TextAlign.Right)
     }
