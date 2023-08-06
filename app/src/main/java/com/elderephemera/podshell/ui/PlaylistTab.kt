@@ -11,6 +11,7 @@ import androidx.media3.common.Player
 import com.elderephemera.podshell.data.Episode
 import com.elderephemera.podshell.data.EpisodesRepository
 import com.elderephemera.podshell.data.FeedsRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -19,6 +20,7 @@ class PlaylistTab(
     private val feedsRepository: FeedsRepository,
     private val episodesRepository: EpisodesRepository,
     private val snackbarHostState: SnackbarHostState,
+    private val scope: CoroutineScope,
     private val player: Player,
 ) : AppTab {
     override val title = "PLAYLIST"
@@ -30,7 +32,11 @@ class PlaylistTab(
         episodesRepository.getAllEpisodesInPlaylist().map {
             it.sortedWith(sortingOrder.comparator).map { episode ->
                 val feed = feedsRepository.getFeed(episode.feedId)
-                PlaylistItemCard(feed, episode, player, episodesRepository)
+                PlaylistItemCard(
+                    feed, episode,
+                    snackbarHostState, scope,
+                    player, episodesRepository
+                )
             }
         }
 

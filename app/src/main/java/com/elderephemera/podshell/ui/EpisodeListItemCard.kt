@@ -1,10 +1,8 @@
 package com.elderephemera.podshell.ui
 
+import androidx.annotation.OptIn
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -12,7 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.media3.common.util.UnstableApi
 import coil.compose.AsyncImage
+import com.elderephemera.podshell.DownloadsSingleton
 import com.elderephemera.podshell.data.Episode
 import com.elderephemera.podshell.data.EpisodesRepository
 import kotlinx.coroutines.CoroutineScope
@@ -37,8 +38,10 @@ class EpisodeListItemCard(
     override val subtitle = "Published " + episode.pubDateDisplay
     override val description = episode.description
 
+    @OptIn(UnstableApi::class)
     @Composable
     override fun ActionButton() {
+        val context = LocalContext.current
         val coroutineScope = rememberCoroutineScope()
 
         if (episode.position != null && episode.length != null) {
@@ -56,6 +59,10 @@ class EpisodeListItemCard(
                         inPlaylist = !episode.inPlaylist,
                         new = false,
                     ))
+                    if (episode.inPlaylist) {
+                        DownloadsSingleton.getInstance(context).cacheDataSourceFactory.cache
+                            ?.removeResource(episode.guid)
+                    }
                 }
             },
         ) {

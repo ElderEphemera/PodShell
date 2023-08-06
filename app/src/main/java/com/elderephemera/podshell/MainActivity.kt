@@ -73,6 +73,7 @@ class MainActivity : ComponentActivity() {
                                 appContainer.feedsRepository,
                                 appContainer.episodesRepository,
                                 scaffoldState.snackbarHostState,
+                                rememberCoroutineScope(),
                                 player,
                             ),
                             NewEpisodesTab(

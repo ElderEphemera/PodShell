@@ -37,6 +37,8 @@ import kotlinx.coroutines.launch
 class PlaylistItemCard(
     private val feed: Feed,
     private val episode: Episode,
+    private val snackbarHostState: SnackbarHostState,
+    private val scope: CoroutineScope,
     private val player: Player,
     private val episodesRepository: EpisodesRepository,
 ) : ListItemCard {
@@ -56,8 +58,19 @@ class PlaylistItemCard(
     override val description = episode.description
 
     override fun onLongClick(coroutineScope: CoroutineScope) {
-        coroutineScope.launch {
+        scope.launch {
             episodesRepository.updateEpisode(episode.copy(inPlaylist = false))
+            snackbarHostState.currentSnackbarData?.dismiss()
+            val result = snackbarHostState.showSnackbar(
+                message = "Deleted ${episode.title}",
+                actionLabel = "Undo",
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                episodesRepository.updateEpisode(episode.copy(inPlaylist = true))
+            } else {
+                DownloadsSingleton.getInstance()?.cacheDataSourceFactory?.cache
+                    ?.removeResource(episode.guid)
+            }
         }
     }
 
@@ -101,7 +114,7 @@ class PlaylistItemCard(
             DownloadRequest.Builder(episode.guid, Uri.parse(episode.source))
                 .setCustomCacheKey(episode.guid)
                 .build()
-        val download: Download? = DownloadsSingleton.getInstance()
+        val download: Download? = DownloadsSingleton.getInstance(context)
             .downloadManager
             .downloadIndex
             .getDownload(downloadRequest.id)

@@ -23,7 +23,7 @@ class DownloadsSingleton private constructor(context: Context) {
                 DownloadsSingleton(context).also { Instance = it }
             }
 
-        fun getInstance(): DownloadsSingleton = Instance!!
+        fun getInstance(): DownloadsSingleton? = Instance
     }
 
     private val databaseProvider = StandaloneDatabaseProvider(context)
