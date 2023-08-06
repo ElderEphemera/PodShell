@@ -85,6 +85,12 @@ val Context.prefHandleAudioBecomingNoisy get() = Pref.inDataStore(
     default = true,
 )
 
+val Context.prefAutoRefreshInterval get() = Pref.inDataStore(
+    context = this,
+    key = intPreferencesKey("auto-refresh-interval"),
+    default = 24,
+)
+
 enum class ThemeType {
     System { override val isDark @Composable get() = isSystemInDarkTheme() },
     Light { override val isDark @Composable get() = false },

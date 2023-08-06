@@ -19,10 +19,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.elderephemera.podshell.*
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun preferencesDialog(): () -> Unit {
+    val context = LocalContext.current
     var visible by remember { mutableStateOf(false) }
 
     AnimatedVisibility(visible) {
@@ -57,6 +59,33 @@ fun preferencesDialog(): () -> Unit {
                         pref = LocalContext.current.prefThemeType,
                         options = ThemeType.values(),
                         display = { it.name },
+                    )
+
+                    Header("Network")
+                    PrefOptions(
+                        name = "Auto-refresh Feeds",
+                        pref =  LocalContext.current.prefAutoRefreshInterval,
+                        options = arrayOf(0, 1, 2, 3, 6, 12, 24, 48, 168, 336),
+                        display = {
+                            if (it == 0) "Never"
+                            else it.hours.toComponents { days, hours, _, _, _ ->
+                                val weeksString =
+                                    if (days >= 14) "${days/7} weeks"
+                                    else if (days >= 7) "1 week"
+                                    else null
+                                val daysString =
+                                    if (days%7 >= 2) "${days%7} days"
+                                    else if (days%7 == 1L) "1 day"
+                                    else null
+                                val hoursString =
+                                    if (hours >= 2) "$hours hours"
+                                    else if (hours == 1) "1 hour"
+                                    else null
+                                "Every " + listOfNotNull(weeksString, daysString, hoursString)
+                                    .joinToString(" ").removePrefix("1 ")
+                            }
+                        },
+                        onUpdate = { RefreshService.rescheduleRefresh(context) }
                     )
 
                     Header("Playback")
@@ -115,7 +144,13 @@ fun PrefCheckbox(name: String, description: String, pref: Pref<Boolean>) =
     }
 
 @Composable
-fun <T> PrefOptions(name: String, pref: Pref<T>, options: Array<T>, display: (T) -> String) = Box {
+fun <T> PrefOptions(
+    name: String,
+    pref: Pref<T>,
+    options: Array<T>,
+    display: (T) -> String,
+    onUpdate: () -> Unit = {},
+) = Box {
     val coroutineScope = rememberCoroutineScope()
     val value by pref.state()
     var dialogVisible by remember { mutableStateOf(false) }
@@ -136,7 +171,10 @@ fun <T> PrefOptions(name: String, pref: Pref<T>, options: Array<T>, display: (T)
                                 .selectable(
                                     selected = option == value,
                                     onClick = {
-                                        coroutineScope.launch { pref.set(option) }
+                                        coroutineScope.launch {
+                                            pref.set(option)
+                                            onUpdate()
+                                        }
                                         dialogVisible = false
                                     },
                                     role = Role.RadioButton

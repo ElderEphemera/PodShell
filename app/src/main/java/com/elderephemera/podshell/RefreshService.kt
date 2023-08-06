@@ -13,11 +13,8 @@ import androidx.work.WorkerParameters
 import com.elderephemera.podshell.data.AppDataContainer
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.toJavaDuration
 
@@ -40,15 +37,28 @@ class RefreshService : Service() {
             workInfosFuture.addListener(
                 {
                     if (workInfosFuture.get().isEmpty()) {
-                        workManager.enqueue(
-                            PeriodicWorkRequestBuilder<RefreshWorker>(1.hours.toJavaDuration())
-                                .addTag(WORKER_TAG)
-                                .build()
-                        )
+                        scheduleRefresh(context, workManager)
                     }
                 },
                 ContextCompat.getMainExecutor(context)
             )
+        }
+
+        fun rescheduleRefresh(context: Context) {
+            val workManager = WorkManager.getInstance(context)
+            workManager.cancelAllWorkByTag(WORKER_TAG)
+            scheduleRefresh(context, workManager)
+        }
+
+        private fun scheduleRefresh(context: Context, workManager: WorkManager) {
+            MainScope().launch {
+                val interval = context.prefAutoRefreshInterval.flow.first().hours
+                workManager.enqueue(
+                    PeriodicWorkRequestBuilder<RefreshWorker>(interval.toJavaDuration())
+                        .addTag(WORKER_TAG)
+                        .build()
+                )
+            }
         }
 
         class RefreshWorker(private val context: Context, workerParams: WorkerParameters)
