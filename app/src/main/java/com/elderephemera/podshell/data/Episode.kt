@@ -1,5 +1,6 @@
 package com.elderephemera.podshell.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
@@ -23,6 +24,7 @@ data class Episode(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val guid: String,
+    @ColumnInfo(index = true)
     val feedId: Long,
     val source: String,
     val inPlaylist: Boolean = false,
