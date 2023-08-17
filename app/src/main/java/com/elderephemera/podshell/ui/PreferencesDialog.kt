@@ -23,8 +23,10 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
-fun preferencesDialog(): () -> Unit {
+fun preferencesDialog(fileManager: FileManager): () -> Unit {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     var visible by remember { mutableStateOf(false) }
 
     AnimatedVisibility(visible) {
@@ -105,6 +107,13 @@ fun preferencesDialog(): () -> Unit {
                         name = "Pause On Headphones Disconnect",
                         description = "Pause playback when switching from a headset or bluetooth device to the internal speakers",
                         pref = LocalContext.current.prefHandleAudioBecomingNoisy
+                    )
+
+                    Header("Import/Export")
+                    PrefButton(
+                        name = "Export To OPML",
+                        description = "Export your subscriptions to an OPML file, which is supported by many podcast apps",
+                        onClick = { scope.launch { fileManager.exportOpml() } }
                     )
                 }
             }
@@ -200,21 +209,22 @@ fun <T> PrefOptions(
         )
     }
 
-    Column(
-        modifier = Modifier
-            .clickable(onClick = { dialogVisible = true })
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        Text(
-            text = name,
-            style = MaterialTheme.typography.subtitle1,
-        )
-        Text(
-            text = display(value),
-            style = MaterialTheme.typography.subtitle2,
-        )
-    }
+    PrefButton(
+        name = name,
+        description = display(value),
+        onClick = { dialogVisible = true }
+    )
+}
+
+@Composable
+fun PrefButton(name: String, description: String, onClick: () -> Unit) = Column(
+    modifier = Modifier
+        .clickable { onClick() }
+        .fillMaxWidth()
+        .padding(8.dp)
+) {
+    Text(text = name, style = MaterialTheme.typography.subtitle1)
+    Text(text = description, style = MaterialTheme.typography.subtitle2)
 }
 
 private val jumpIntervals = arrayOf<Long>(5_000, 10_000, 20_000, 30_000, 60_000, 300_000)

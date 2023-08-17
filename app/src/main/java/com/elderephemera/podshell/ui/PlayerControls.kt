@@ -12,11 +12,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.C
 import androidx.media3.common.Player
+import com.elderephemera.podshell.FileManager
 import com.elderephemera.podshell.PlayerService
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
-fun PlayerControls(player: Player) = Column(
+fun PlayerControls(player: Player, fileManager: FileManager) = Column(
     modifier = Modifier
         .background(MaterialTheme.colors.surface)
 ) {
@@ -49,7 +50,7 @@ fun PlayerControls(player: Player) = Column(
         }
     }
 
-    val openPreferencesDialog = preferencesDialog()
+    val openPreferencesDialog = preferencesDialog(fileManager)
 
     Timeline(currentPosition, duration, hasMediaItem, player::seekTo)
 

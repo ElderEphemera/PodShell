@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 class MainActivity : ComponentActivity() {
+    private lateinit var fileManager: AppFileManager
     private var controller: MediaController? by mutableStateOf(null)
 
     @OptIn(ExperimentalFoundationApi::class)
@@ -42,6 +43,13 @@ class MainActivity : ComponentActivity() {
         }
 
         val appContainer = AppDataContainer(applicationContext)
+
+        fileManager = AppFileManager(
+            activityResultRegistry,
+            contentResolver,
+            appContainer.feedsRepository,
+        )
+        lifecycle.addObserver(fileManager)
 
         val sessionToken =
             SessionToken(this, ComponentName(this, PlayerService::class.java))
@@ -102,7 +110,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             },
                             bottomBar = {
-                                PlayerControls(player)
+                                PlayerControls(player, fileManager)
                             },
                             floatingActionButton = { Fab(tabs[pagerState.targetPage]) }
                         ) { padding ->
