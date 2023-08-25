@@ -4,8 +4,10 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -49,7 +51,12 @@ fun preferencesDialog(fileManager: FileManager): () -> Unit {
                     backgroundColor = MaterialTheme.colors.primary,
                     contentColor = MaterialTheme.colors.onPrimary,
                 )
-                Column(modifier = Modifier.padding(12.dp)) {
+                val scrollState = rememberScrollState()
+                Column(
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .verticalScroll(scrollState)
+                ) {
                     Header("Appearance")
                     PrefCheckbox(
                         name = "Override System Font Size",
