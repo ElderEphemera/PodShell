@@ -150,6 +150,7 @@ interface ListItemCard {
                     it.text = HtmlCompat.fromHtml(description, HtmlCompat.FROM_HTML_MODE_LEGACY)
                     it.maxLines = if (expanded) Int.MAX_VALUE else 1
                     it.textSize = fontSize
+                    it.setTextColor(onSurface)
                 },
                 modifier = Modifier.padding(5.dp)
             )
