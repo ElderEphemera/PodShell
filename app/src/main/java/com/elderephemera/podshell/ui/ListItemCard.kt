@@ -18,6 +18,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextDecoration
@@ -156,11 +158,14 @@ interface ListItemCard {
 }
 
 @Composable
-fun List<ListItemCard>.ItemCardList() = LazyColumn(
+fun List<ListItemCard>.ItemCardList(
+    scrollConnection: NestedScrollConnection = object : NestedScrollConnection {}
+) = LazyColumn(
     verticalArrangement = Arrangement.spacedBy(10.dp),
     modifier = Modifier
         .fillMaxSize()
         .padding(10.dp)
+        .nestedScroll(scrollConnection)
 ) {
     items(this@ItemCardList, key = ListItemCard::key) {
         it.Content()

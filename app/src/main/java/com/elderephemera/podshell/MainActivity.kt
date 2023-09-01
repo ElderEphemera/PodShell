@@ -17,6 +17,9 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.core.content.ContextCompat
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
@@ -76,6 +79,20 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     controller?.let { player ->
+                        var fabVisible by remember { mutableStateOf(true) }
+                        val scrollConnection = remember { object : NestedScrollConnection {
+                            val tolerance = 5
+
+                            override fun onPostScroll(
+                                consumed: Offset,
+                                available: Offset,
+                                source: NestedScrollSource
+                            ): Offset {
+                                if (consumed.y < -tolerance) fabVisible = false
+                                else if (consumed.y > tolerance) fabVisible = true
+                                return Offset.Zero
+                            }
+                        }}
                         val pagerState = rememberPagerState(
                             initialPage = intent.extras?.getInt("tab") ?: 0
                         )
@@ -112,12 +129,17 @@ class MainActivity : ComponentActivity() {
                             bottomBar = {
                                 PlayerControls(player, fileManager)
                             },
-                            floatingActionButton = { Fab(tabs[pagerState.targetPage]) }
+                            floatingActionButton = {
+                                Fab(
+                                    tabs[pagerState.targetPage],
+                                    fabVisible && !pagerState.isScrollInProgress
+                                )
+                            }
                         ) { padding ->
                             Box(modifier = Modifier
                                 .fillMaxSize()
                                 .padding(padding)) {
-                                Pages(tabs, pagerState)
+                                Pages(tabs, pagerState, scrollConnection)
                             }
                         }
                     }
@@ -134,13 +156,13 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun Fab(tab: AppTab) {
+fun Fab(tab: AppTab, visible: Boolean) {
     val duration = 150
     val delay = 100
     val easing = FastOutSlowInEasing
 
     AnimatedContent(
-        targetState = tab,
+        targetState = Pair(tab, visible),
         transitionSpec = {
             ContentTransform(
                 targetContentEnter =
@@ -148,8 +170,7 @@ fun Fab(tab: AppTab) {
                         animationSpec = tween(duration, delay, easing),
                         expandFrom = Alignment.Center,
                         clip = false
-                    ) + fadeIn(tween(duration, delay, easing))
-                            ,
+                    ) + fadeIn(tween(duration, delay, easing)),
                 initialContentExit =
                     shrinkOut(
                         animationSpec = tween(duration, 0, easing),
@@ -159,8 +180,8 @@ fun Fab(tab: AppTab) {
             )
         },
         contentAlignment = Alignment.Center,
-    ) {
-        it.Fab()
+    ) { (currentTab, currentVisibility) ->
+        if (currentVisibility) { currentTab.Fab() }
     }
 }
 
@@ -181,10 +202,10 @@ fun TabBar(tabs: List<AppTab>, selectedTab: Int, setSelectedTab: (Int) -> Unit) 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun Pages(tabs: List<AppTab>, pagerState: PagerState) {
+fun Pages(tabs: List<AppTab>, pagerState: PagerState, scrollConnection: NestedScrollConnection) {
     HorizontalPager(
         pageCount = 3,
         state = pagerState,
         modifier = Modifier.fillMaxSize(),
-    ) { tabs[it].Content() }
+    ) { tabs[it].Content(scrollConnection) }
 }

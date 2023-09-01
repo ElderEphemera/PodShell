@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import kotlinx.coroutines.flow.Flow
 
 interface AppTab {
@@ -19,12 +20,12 @@ interface AppTab {
     fun listItems(): Flow<List<ListItemCard>>
 
     @Composable
-    fun Content() = Scaffold(
+    fun Content(scrollConnection: NestedScrollConnection) = Scaffold(
         modifier = Modifier.fillMaxSize(),
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             val listItems by listItems().collectAsState(listOf())
-            listItems.ItemCardList()
+            listItems.ItemCardList(scrollConnection)
         }
     }
 }
