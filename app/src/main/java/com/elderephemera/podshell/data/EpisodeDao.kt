@@ -22,4 +22,7 @@ interface EpisodeDao {
 
     @Query("SELECT * FROM episodes WHERE new = TRUE")
     fun getAllNew(): Flow<List<Episode>>
+
+    @Query("UPDATE episodes SET new = FALSE WHERE new = TRUE")
+    suspend fun clearNew()
 }

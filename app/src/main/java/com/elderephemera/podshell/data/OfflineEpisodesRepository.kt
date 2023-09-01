@@ -13,4 +13,6 @@ class OfflineEpisodesRepository(private val episodeDao: EpisodeDao) : EpisodesRe
     override fun getAllEpisodesInPlaylist() = episodeDao.getAllInPlaylist()
 
     override fun getAllNewEpisodes() = episodeDao.getAllNew()
+
+    override suspend fun clearNewEpisodes() = episodeDao.clearNew()
 }

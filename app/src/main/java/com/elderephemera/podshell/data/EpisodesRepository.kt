@@ -9,4 +9,5 @@ interface EpisodesRepository {
     fun getAllFeedEpisodes(feed: Feed): Flow<List<Episode>>
     fun getAllEpisodesInPlaylist(): Flow<List<Episode>>
     fun getAllNewEpisodes(): Flow<List<Episode>>
+    suspend fun clearNewEpisodes()
 }
