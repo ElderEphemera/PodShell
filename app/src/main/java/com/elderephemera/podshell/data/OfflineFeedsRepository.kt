@@ -2,7 +2,7 @@ package com.elderephemera.podshell.data
 
 import com.prof.rssparser.Parser
 import kotlinx.coroutines.flow.first
-import okhttp3.OkHttpClient
+import okhttp3.Call
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -10,6 +10,7 @@ import kotlin.time.toDuration
 class OfflineFeedsRepository(
     private val feedDao: FeedDao,
     private val episodesRepository: EpisodesRepository,
+    callFactory: Call.Factory,
 ) : FeedsRepository {
     override suspend fun insertFeed(url: String) = feedDao.insert(Feed(
         logo = null,
@@ -23,20 +24,7 @@ class OfflineFeedsRepository(
 
     override fun getAllFeeds() = feedDao.getAll()
 
-    private val parser = Parser.Builder(
-        callFactory = OkHttpClient.Builder().run {
-            addNetworkInterceptor { chain ->
-                chain.proceed(
-                    chain.request().newBuilder().run {
-                        // feeds.buzzsprout.com rejects requests with the default OkHttp user agent
-                        header("User-Agent", "podshell")
-                        build()
-                    }
-                )
-            }
-            build()
-        }
-    ).build()
+    private val parser = Parser.Builder(callFactory = callFactory).build()
     override suspend fun updateFeed(id: Long, url: String, markNew: Boolean) {
         val channel = try { parser.getChannel(url) } catch (e: Exception) {
             feedDao.setError(id, error = "Refresh failed: ${e.message ?: "Unknown error"}")

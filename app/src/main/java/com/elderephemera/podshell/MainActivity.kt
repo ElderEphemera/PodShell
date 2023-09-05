@@ -51,6 +51,7 @@ class MainActivity : ComponentActivity() {
 
         val imageLoader = ImageLoader.Builder(this)
             .respectCacheHeaders(enable = false)
+            .callFactory(appContainer.okHttpCallFactory)
             .build()
         Coil.setImageLoader(imageLoader)
 
