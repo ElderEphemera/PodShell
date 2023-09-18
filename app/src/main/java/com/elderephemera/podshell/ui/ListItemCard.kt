@@ -137,6 +137,7 @@ interface ListItemCard {
                 factory = { context ->
                     TextView(context).apply {
                         text = HtmlCompat.fromHtml(description, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                            .trim()
                         ellipsize = TextUtils.TruncateAt.END
                         maxLines = if (expanded) Int.MAX_VALUE else 1
                         setTextColor(onSurface)
@@ -148,6 +149,7 @@ interface ListItemCard {
                 },
                 update = {
                     it.text = HtmlCompat.fromHtml(description, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                        .trim()
                     it.maxLines = if (expanded) Int.MAX_VALUE else 1
                     it.textSize = fontSize
                     it.setTextColor(onSurface)
