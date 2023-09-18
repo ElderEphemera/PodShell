@@ -66,7 +66,12 @@ fun Main(
                         }
                     }
                 }
+
                 val pagerState = rememberPagerState(initialPage = specifiedTab ?: 0)
+                LaunchedEffect(pagerState) {
+                    snapshotFlow { pagerState.currentPage }.collect { fabVisible = true }
+                }
+
                 val scaffoldState = rememberScaffoldState()
                 val tabs = listOf(
                     PlaylistTab(
