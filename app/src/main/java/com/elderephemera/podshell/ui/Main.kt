@@ -43,82 +43,84 @@ fun Main(
         darkTheme = themeType.isDark,
         overrideTextSize = overrideTextSize,
     ) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colors.background
-        ) {
-            controller?.let { player ->
-                var fabVisible by remember { mutableStateOf(true) }
-                val scrollConnection = remember {
-                    object : NestedScrollConnection {
-                        val tolerance = 5
+        Surface(color = MaterialTheme.colors.primary) {
+            Surface(
+                modifier = Modifier.safeDrawingPadding().fillMaxSize(),
+                color = MaterialTheme.colors.background,
+            ) {
+                controller?.let { player ->
+                    var fabVisible by remember { mutableStateOf(true) }
+                    val scrollConnection = remember {
+                        object : NestedScrollConnection {
+                            val tolerance = 5
 
-                        override fun onPostScroll(
-                            consumed: Offset,
-                            available: Offset,
-                            source: NestedScrollSource
-                        ): Offset {
-                            if (consumed.y < -tolerance) fabVisible = false
-                            else if (consumed.y > tolerance) fabVisible = true
-                            return Offset.Zero
+                            override fun onPostScroll(
+                                consumed: Offset,
+                                available: Offset,
+                                source: NestedScrollSource
+                            ): Offset {
+                                if (consumed.y < -tolerance) fabVisible = false
+                                else if (consumed.y > tolerance) fabVisible = true
+                                return Offset.Zero
+                            }
                         }
                     }
-                }
 
-                val pagerState = rememberPagerState(
-                    initialPage = specifiedTab ?: 0,
-                    pageCount = { 3 }
+                    val pagerState = rememberPagerState(
+                        initialPage = specifiedTab ?: 0,
+                        pageCount = { 3 }
                     )
-                LaunchedEffect(pagerState) {
-                    snapshotFlow { pagerState.currentPage }.collect { fabVisible = true }
-                }
-
-                val scaffoldState = rememberScaffoldState()
-                val tabs = listOf(
-                    PlaylistTab(
-                        appContainer.feedsRepository,
-                        appContainer.episodesRepository,
-                        scaffoldState.snackbarHostState,
-                        rememberCoroutineScope(),
-                        player,
-                    ),
-                    NewEpisodesTab(
-                        appContainer.episodesRepository,
-                    ),
-                    SubscriptionsTab(
-                        appContainer.feedsRepository,
-                        appContainer.episodesRepository,
-                    ),
-                )
-                val animationScope = rememberCoroutineScope()
-                Scaffold(
-                    scaffoldState = scaffoldState,
-                    topBar = {
-                        TabBar(tabs, pagerState.currentPage) {
-                            animationScope.launch {
-                                pagerState.animateScrollToPage(it, 0F)
-                            }
-                            if (it == 1) {
-                                RefreshService.cancelNotification(context)
-                            }
-                        }
-                    },
-                    bottomBar = {
-                        PlayerControls(player, fileManager)
-                    },
-                    floatingActionButton = {
-                        Fab(
-                            tabs[pagerState.targetPage],
-                            fabVisible && !pagerState.isScrollInProgress
-                        )
+                    LaunchedEffect(pagerState) {
+                        snapshotFlow { pagerState.currentPage }.collect { fabVisible = true }
                     }
-                ) { padding ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(padding)
-                    ) {
-                        Pages(tabs, pagerState, scrollConnection)
+
+                    val scaffoldState = rememberScaffoldState()
+                    val tabs = listOf(
+                        PlaylistTab(
+                            appContainer.feedsRepository,
+                            appContainer.episodesRepository,
+                            scaffoldState.snackbarHostState,
+                            rememberCoroutineScope(),
+                            player,
+                        ),
+                        NewEpisodesTab(
+                            appContainer.episodesRepository,
+                        ),
+                        SubscriptionsTab(
+                            appContainer.feedsRepository,
+                            appContainer.episodesRepository,
+                        ),
+                    )
+                    val animationScope = rememberCoroutineScope()
+                    Scaffold(
+                        scaffoldState = scaffoldState,
+                        topBar = {
+                            TabBar(tabs, pagerState.currentPage) {
+                                animationScope.launch {
+                                    pagerState.animateScrollToPage(it, 0F)
+                                }
+                                if (it == 1) {
+                                    RefreshService.cancelNotification(context)
+                                }
+                            }
+                        },
+                        bottomBar = {
+                            PlayerControls(player, fileManager)
+                        },
+                        floatingActionButton = {
+                            Fab(
+                                tabs[pagerState.targetPage],
+                                fabVisible && !pagerState.isScrollInProgress
+                            )
+                        }
+                    ) { padding ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(padding)
+                        ) {
+                            Pages(tabs, pagerState, scrollConnection)
+                        }
                     }
                 }
             }
