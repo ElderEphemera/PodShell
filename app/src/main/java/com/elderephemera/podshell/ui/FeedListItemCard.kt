@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -51,7 +51,7 @@ class FeedListItemCard(
     @Composable
     override fun ActionButton() = IconButton(onClick = openList) {
         Icon(
-            Icons.Filled.List,
+            Icons.AutoMirrored.Filled.List,
             contentDescription = "Show feed episodes",
             modifier = Modifier.size(abIconSize)
         )
