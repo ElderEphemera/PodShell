@@ -23,10 +23,8 @@ import com.elderephemera.podshell.RefreshService
 import com.elderephemera.podshell.data.AppDataContainer
 import com.elderephemera.podshell.prefOverrideTextSize
 import com.elderephemera.podshell.prefThemeType
-import com.elderephemera.podshell.ui.*
 import com.elderephemera.podshell.ui.theme.PodShellTheme
 import kotlinx.coroutines.launch
-import java.util.*
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
@@ -67,7 +65,10 @@ fun Main(
                     }
                 }
 
-                val pagerState = rememberPagerState(initialPage = specifiedTab ?: 0)
+                val pagerState = rememberPagerState(
+                    initialPage = specifiedTab ?: 0,
+                    pageCount = { 3 }
+                    )
                 LaunchedEffect(pagerState) {
                     snapshotFlow { pagerState.currentPage }.collect { fabVisible = true }
                 }
@@ -175,7 +176,6 @@ fun TabBar(tabs: List<AppTab>, selectedTab: Int, setSelectedTab: (Int) -> Unit) 
 @Composable
 fun Pages(tabs: List<AppTab>, pagerState: PagerState, scrollConnection: NestedScrollConnection) {
     HorizontalPager(
-        pageCount = 3,
         state = pagerState,
         modifier = Modifier.fillMaxSize(),
     ) { tabs[it].Content(scrollConnection) }
