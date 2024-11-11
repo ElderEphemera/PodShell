@@ -21,9 +21,13 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
@@ -92,7 +96,9 @@ interface ListItemCard {
                             style = MaterialTheme.typography.subtitle1,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = if (expanded) Int.MAX_VALUE else 2,
-                            minLines = 2,
+                            modifier = Modifier.defaultMinSize(
+                                minHeight = lineHeightDp(MaterialTheme.typography.subtitle1)*2
+                            ),
                         )
                         val uriHandler = LocalUriHandler.current
                         Text(
@@ -157,6 +163,23 @@ interface ListItemCard {
                 modifier = Modifier.padding(5.dp)
             )
         }
+    }
+}
+
+/**
+ * Calculate the height of a line of text in the given style.
+ *
+ * This is used as a workaround for minLines being broken.
+ * See: https://issuetracker.google.com/issues/297974035
+ */
+@Composable
+private fun lineHeightDp(style: TextStyle): Dp {
+    val textMeasurer = rememberTextMeasurer(cacheSize = 1)
+    val singleLineHeightPx = remember(textMeasurer, style) {
+        textMeasurer.measure("", style).size.height
+    }
+    return with(LocalDensity.current) {
+        singleLineHeightPx.toDp()
     }
 }
 
