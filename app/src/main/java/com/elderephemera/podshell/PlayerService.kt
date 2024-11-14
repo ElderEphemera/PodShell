@@ -107,7 +107,7 @@ class PlayerService : MediaSessionService() {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             if (isPlaying) {
                 timerTask = timerTask { scope.launch { updateTime() } }
-                timer.scheduleAtFixedRate(timerTask, 0, 1000)
+                timer.schedule(timerTask, 0, 1000)
             } else {
                 cancel()
             }
