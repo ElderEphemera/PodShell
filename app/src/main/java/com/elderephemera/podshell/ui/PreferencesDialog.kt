@@ -38,6 +38,7 @@ fun preferencesDialog(fileManager: FileManager): () -> Unit {
         ) {
             Column(
                 modifier = Modifier
+                    .padding(10.dp)
                     .fillMaxSize()
                     .background(MaterialTheme.colors.background)
             ) {
