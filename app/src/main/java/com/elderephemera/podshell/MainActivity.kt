@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
         val specifiedTab = intent.extras?.getInt("tab")
 
         if (specifiedTab == 1) {
-            RefreshWorker.cancelNotification(this)
+            RefreshWorker.cancelNewEpisodeNotification(this)
         }
 
         val appContainer = AppDataContainer(applicationContext)

@@ -100,7 +100,7 @@ fun Main(
                                     pagerState.animateScrollToPage(it, 0F)
                                 }
                                 if (it == 1) {
-                                    RefreshWorker.cancelNotification(context)
+                                    RefreshWorker.cancelNewEpisodeNotification(context)
                                 }
                             }
                         },
