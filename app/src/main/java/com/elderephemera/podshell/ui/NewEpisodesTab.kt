@@ -1,6 +1,5 @@
 package com.elderephemera.podshell.ui
 
-import android.content.Intent
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -9,8 +8,7 @@ import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
-import com.elderephemera.podshell.RefreshService
+import com.elderephemera.podshell.RefreshWorker
 import com.elderephemera.podshell.data.EpisodesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -36,10 +34,7 @@ class NewEpisodesTab(
         val noEpisodes by remember { derivedStateOf { episodes.isEmpty() } }
         if (noEpisodes) {
             FloatingActionButton(
-                onClick = {
-                    val intent = Intent(context, RefreshService::class.java)
-                    ContextCompat.startForegroundService(context, intent)
-                },
+                onClick = { scope.launch { RefreshWorker.runRefresh(context) } },
                 backgroundColor = MaterialTheme.colors.primary,
                 content = { Icon(Icons.Filled.Refresh, contentDescription = "Refresh feeds") },
             )

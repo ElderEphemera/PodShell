@@ -15,7 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.elderephemera.podshell.RefreshService
+import com.elderephemera.podshell.RefreshWorker
 import com.elderephemera.podshell.data.Episode
 import com.elderephemera.podshell.data.EpisodesRepository
 import com.elderephemera.podshell.data.Feed
@@ -89,7 +89,7 @@ class SubscriptionsTab(
                                 coroutineScope.launch {
                                     val feedId = feedsRepository.insertFeed(feedUrl)
                                     feedsRepository.updateFeed(feedId, feedUrl, markNew = false)
-                                    RefreshService.ensureRefreshScheduled(context)
+                                    RefreshWorker.ensureRefreshScheduled(context)
                                 }
                                 showAddFeedDialog = false
                             },

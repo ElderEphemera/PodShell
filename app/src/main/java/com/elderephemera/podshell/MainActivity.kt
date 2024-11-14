@@ -4,9 +4,6 @@ import android.content.ComponentName
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.core.content.ContextCompat
 import androidx.media3.common.util.UnstableApi
@@ -16,7 +13,6 @@ import coil.Coil
 import coil.ImageLoader
 import com.elderephemera.podshell.data.AppDataContainer
 import com.elderephemera.podshell.ui.*
-import java.util.*
 
 class MainActivity : ComponentActivity() {
     private lateinit var fileManager: AppFileManager
@@ -29,7 +25,7 @@ class MainActivity : ComponentActivity() {
         val specifiedTab = intent.extras?.getInt("tab")
 
         if (specifiedTab == 1) {
-            RefreshService.cancelNotification(this)
+            RefreshWorker.cancelNotification(this)
         }
 
         val appContainer = AppDataContainer(applicationContext)

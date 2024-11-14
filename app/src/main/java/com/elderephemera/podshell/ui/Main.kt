@@ -19,7 +19,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.platform.LocalContext
 import androidx.media3.session.MediaController
 import com.elderephemera.podshell.FileManager
-import com.elderephemera.podshell.RefreshService
+import com.elderephemera.podshell.RefreshWorker
 import com.elderephemera.podshell.data.AppDataContainer
 import com.elderephemera.podshell.prefOverrideTextSize
 import com.elderephemera.podshell.prefThemeType
@@ -100,7 +100,7 @@ fun Main(
                                     pagerState.animateScrollToPage(it, 0F)
                                 }
                                 if (it == 1) {
-                                    RefreshService.cancelNotification(context)
+                                    RefreshWorker.cancelNotification(context)
                                 }
                             }
                         },

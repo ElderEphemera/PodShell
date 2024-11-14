@@ -94,7 +94,7 @@ fun preferencesDialog(fileManager: FileManager): () -> Unit {
                                     .joinToString(" ").removePrefix("1 ")
                             }
                         },
-                        onUpdate = { RefreshService.rescheduleRefresh(context) }
+                        onUpdate = { RefreshWorker.scheduleRefresh(context) }
                     )
 
                     Header("Playback")
