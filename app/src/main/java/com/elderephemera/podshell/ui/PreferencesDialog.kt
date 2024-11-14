@@ -118,6 +118,11 @@ fun preferencesDialog(fileManager: FileManager): () -> Unit {
 
                     Header("Import/Export")
                     PrefButton(
+                        name = "Import From OPML",
+                        description = "Import your subscriptions from an OPML file",
+                        onClick = { fileManager.importOpml() }
+                    )
+                    PrefButton(
                         name = "Export To OPML",
                         description = "Export your subscriptions to an OPML file, which is supported by many podcast apps",
                         onClick = { scope.launch { fileManager.exportOpml() } }
