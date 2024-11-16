@@ -17,6 +17,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.media3.session.MediaController
 import com.elderephemera.podshell.FileManager
 import com.elderephemera.podshell.RefreshWorker
@@ -43,9 +44,18 @@ fun Main(
         darkTheme = themeType.isDark,
         overrideTextSize = overrideTextSize,
     ) {
-        Surface(color = MaterialTheme.colors.primary) {
+        Column(modifier = Modifier.background(MaterialTheme.colors.surface)) {
+            Box(Modifier
+                .background(MaterialTheme.colors.primary)
+                .height(WindowInsets
+                    .statusBars
+                    .asPaddingValues(LocalDensity.current)
+                    .calculateTopPadding()
+                )
+                .fillMaxWidth()
+            )
             Surface(
-                modifier = Modifier.safeDrawingPadding().fillMaxSize(),
+                modifier = Modifier.navigationBarsPadding().captionBarPadding().fillMaxSize(),
                 color = MaterialTheme.colors.background,
             ) {
                 controller?.let { player ->
