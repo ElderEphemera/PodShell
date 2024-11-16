@@ -43,9 +43,18 @@ fun Main(
         darkTheme = themeType.isDark,
         overrideTextSize = overrideTextSize,
     ) {
-        Surface(color = MaterialTheme.colors.primary) {
+        Column(modifier = Modifier.background(MaterialTheme.colors.surface)) {
+            Box(Modifier
+                .background(MaterialTheme.colors.primary)
+                .height(WindowInsets
+                    .statusBars
+                    .asPaddingValues(LocalDensity.current)
+                    .calculateTopPadding()
+                )
+                .fillMaxWidth()
+            )
             Surface(
-                modifier = Modifier.safeDrawingPadding().fillMaxSize(),
+                modifier = Modifier.navigationBarsPadding().captionBarPadding().fillMaxSize(),
                 color = MaterialTheme.colors.background,
             ) {
                 controller?.let { player ->
