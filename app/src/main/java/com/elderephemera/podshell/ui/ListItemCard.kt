@@ -190,6 +190,7 @@ fun List<ListItemCard>.ItemCardList(
     verticalArrangement = Arrangement.spacedBy(10.dp),
     modifier = Modifier
         .fillMaxSize()
+        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
         .padding(10.dp)
         .nestedScroll(scrollConnection)
 ) {
