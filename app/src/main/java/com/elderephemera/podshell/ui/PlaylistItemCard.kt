@@ -119,7 +119,10 @@ class PlaylistItemCard(
             .downloadIndex
             .getDownload(downloadRequest.id)
 
-        if (download?.state == Download.STATE_DOWNLOADING) {
+        if (
+            download?.state == Download.STATE_DOWNLOADING ||
+            download?.state == Download.STATE_QUEUED
+        ) {
             if (download.percentDownloaded > 0) {
                 CircularProgressIndicator(
                     download.percentDownloaded/100,
