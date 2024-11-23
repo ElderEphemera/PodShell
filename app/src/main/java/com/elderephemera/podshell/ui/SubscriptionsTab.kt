@@ -1,13 +1,15 @@
 package com.elderephemera.podshell.ui
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.platform.LocalContext
@@ -15,11 +17,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.elderephemera.podshell.BuildConfig
 import com.elderephemera.podshell.RefreshWorker
 import com.elderephemera.podshell.data.Episode
 import com.elderephemera.podshell.data.EpisodesRepository
 import com.elderephemera.podshell.data.Feed
 import com.elderephemera.podshell.data.FeedsRepository
+import com.mr3y.podcastindex.ktor3.PodcastIndexClient
+import com.mr3y.podcastindex.model.PodcastFeed
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -58,9 +64,8 @@ class SubscriptionsTab(
 
     private var showAddFeedDialog by mutableStateOf(false)
     @Composable
-    private fun AddFeedDialog() {
+    private fun AddFeedDialog(coroutineScope: CoroutineScope) {
         val context = LocalContext.current
-        val coroutineScope = rememberCoroutineScope()
         AnimatedVisibility(visible = showAddFeedDialog) {
             Dialog(
                 onDismissRequest = { showAddFeedDialog = false },
@@ -71,30 +76,35 @@ class SubscriptionsTab(
                         .padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    var feedUrl by remember { mutableStateOf("") }
+                    var input by remember { mutableStateOf("") }
                     Text(text = "Add Subscription", style = MaterialTheme.typography.subtitle1)
                     TextField(
-                        value = feedUrl,
-                        onValueChange = { feedUrl = it },
-                        placeholder = { Text(text = "Paste feed URL here") },
+                        value = input,
+                        onValueChange = { input = it },
+                        placeholder = { Text(text = "Enter search term or feed URL") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
-                    Box(
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.CenterEnd,
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         TextButton(
                             onClick = {
-                                coroutineScope.launch {
-                                    val feedId = feedsRepository.insertFeed(feedUrl)
-                                    feedsRepository.updateFeed(feedId, feedUrl, markNew = false)
-                                    RefreshWorker.ensureRefreshScheduled(context)
-                                }
+                                subscribe(context, coroutineScope, input)
                                 showAddFeedDialog = false
                             },
                         ) {
-                            Text(text = "SUBSCRIBE")
+                            Text(text = "Subscribe")
+                        }
+                        TextButton(
+                            onClick = {
+                                showAddFeedDialog = false
+                                searchDialogTerm = input
+                                showSearchDialog = true
+                            }
+                        ) {
+                            Text(text = "Search")
                         }
                     }
                 }
@@ -102,11 +112,89 @@ class SubscriptionsTab(
         }
     }
 
+    private var searchDialogTerm by mutableStateOf("")
+    private var showSearchDialog by mutableStateOf(false)
+    @Composable
+    private fun SearchDialog(coroutineScope: CoroutineScope) {
+        val context = LocalContext.current
+        val client = remember {
+            PodcastIndexClient(
+                authKey = BuildConfig.PODCAST_INDEX_KEY,
+                authSecret = BuildConfig.PODCAST_INDEX_SECRET,
+                userAgent = "PodShell/1.0"
+            )
+        }
+        AnimatedVisibility(visible = showSearchDialog) {
+            var searchResults: List<PodcastFeed>? by remember { mutableStateOf(null) }
+            var searchError: String? by remember { mutableStateOf(null) }
+            LaunchedEffect(searchDialogTerm) {
+                try {
+                    searchResults = client.search.forPodcastsByTerm(searchDialogTerm).feeds
+                } catch (e: Exception) {
+                    searchError = e.message
+                }
+            }
+            Dialog(
+                onDismissRequest = { showSearchDialog = false },
+                properties = DialogProperties(usePlatformDefaultWidth = false)
+            ) {
+                val results = searchResults
+                val error = searchError
+                if (error != null) {
+                    AlertDialog(
+                        title = { Text("Error") },
+                        text = { Text(error, color = MaterialTheme.colors.error) },
+                        onDismissRequest = { showSearchDialog = false },
+                        confirmButton = { TextButton(onClick = { showSearchDialog = false }) {
+                            Text("Continue")
+                        } },
+                    )
+                } else if (results == null) {
+                    CircularProgressIndicator()
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .fillMaxSize()
+                            .background(MaterialTheme.colors.background)
+                    ) {
+                        TopAppBar(
+                            title = { Text("Search Results") },
+                            navigationIcon = {
+                                IconButton(onClick = { showSearchDialog = false }) {
+                                    Icon(
+                                        Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = "Back"
+                                    )
+                                }
+                            },
+                            backgroundColor = MaterialTheme.colors.primary,
+                            contentColor = MaterialTheme.colors.onPrimary,
+                        )
+                        results.map { feed ->
+                            SearchItemCard(feed) {
+                                subscribe(context, coroutineScope, feed.url)
+                                showSearchDialog = false
+                            }
+                        }.ItemCardList()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun subscribe(context: Context, coroutineScope: CoroutineScope, feedUrl: String) {
+        coroutineScope.launch {
+            val feedId = feedsRepository.insertFeed(feedUrl)
+            feedsRepository.updateFeed(feedId, feedUrl, markNew = false)
+            RefreshWorker.ensureRefreshScheduled(context)
+        }
+    }
+
     private var unsubscribeDialogFeed: Feed? by mutableStateOf(null)
     private var showUnsubscribeDialog by mutableStateOf(false)
     @Composable
-    private fun UnsubscribeDialog() {
-        val coroutineScope = rememberCoroutineScope()
+    private fun UnsubscribeDialog(coroutineScope: CoroutineScope) {
         AnimatedVisibility(visible = showUnsubscribeDialog) {
             AlertDialog(
                 title = { Text("Unsubscribe from " + unsubscribeDialogFeed?.title + "?") },
@@ -160,8 +248,10 @@ class SubscriptionsTab(
 
     @Composable
     override fun Content(scrollConnection: NestedScrollConnection) {
-        AddFeedDialog()
-        UnsubscribeDialog()
+        val coroutineScope = rememberCoroutineScope()
+        AddFeedDialog(coroutineScope)
+        SearchDialog(coroutineScope)
+        UnsubscribeDialog(coroutineScope)
         ListDialog()
         super.Content(scrollConnection)
     }
