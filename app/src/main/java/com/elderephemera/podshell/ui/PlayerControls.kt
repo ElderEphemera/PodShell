@@ -21,7 +21,9 @@ fun PlayerControls(player: Player, fileManager: FileManager) = Column(
     modifier = Modifier
         .background(MaterialTheme.colors.surface)
         .windowInsetsPadding(
-            WindowInsets.safeDrawing.only(WindowInsetsSides.run { Bottom + Horizontal })
+            WindowInsets.safeDrawing
+                .exclude(WindowInsets.ime)
+                .only(WindowInsetsSides.run { Bottom + Horizontal })
         )
 ) {
     val scope = rememberCoroutineScope()
