@@ -67,7 +67,7 @@ class RefreshWorker(private val context: Context, workerParams: WorkerParameters
             feedTitle: String,
             total: Int, completed: Int
         ) = builder
-            .setContentTitle("Refreshing $feedTitle...")
+            .setContentTitle("Refreshed $feedTitle...")
             .setProgress(total, completed, false)
             .build()
 
@@ -95,18 +95,21 @@ class RefreshWorker(private val context: Context, workerParams: WorkerParameters
             val notificationBuilder = progressNotificationBuilder(context)
 
             val feeds = appContainer.feedsRepository.getAllFeeds().first()
-            feeds.forEachIndexed { idx, feed ->
-                notificationManager.notify(
-                    REFRESH_NOTIFICATION_ID,
-                    progressNotification(
-                        notificationBuilder,
-                        feedTitle = feed.title,
-                        total = feeds.size,
-                        completed = idx
+            var completed = 0
+            feeds.map { feed ->
+                async {
+                    appContainer.feedsRepository.updateFeed(feed.id, feed.rss, markNew = true)
+                    notificationManager.notify(
+                        REFRESH_NOTIFICATION_ID,
+                        progressNotification(
+                            notificationBuilder,
+                            feedTitle = feed.title,
+                            total = feeds.size,
+                            completed = ++completed
+                        )
                     )
-                )
-                appContainer.feedsRepository.updateFeed(feed.id, feed.rss, markNew = true)
-            }
+                }
+            }.awaitAll()
 
             notificationManager.cancel(REFRESH_NOTIFICATION_ID)
 
