@@ -28,8 +28,8 @@ fun PlayerControls(player: Player, fileManager: FileManager) = Column(
 ) {
     val scope = rememberCoroutineScope()
 
-    var currentPosition by remember { mutableStateOf(player.currentPosition) }
-    var duration by remember { mutableStateOf(player.duration) }
+    var currentPosition by remember { mutableLongStateOf(player.currentPosition) }
+    var duration by remember { mutableLongStateOf(player.duration) }
     var hasMediaItem by remember { mutableStateOf(player.currentMediaItem != null) }
     var isPlaying by remember { mutableStateOf(player.isPlaying) }
 
