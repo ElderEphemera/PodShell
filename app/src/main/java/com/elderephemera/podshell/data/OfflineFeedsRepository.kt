@@ -49,7 +49,9 @@ class OfflineFeedsRepository(
                 inPlaylist = old?.inPlaylist ?: false,
                 new = old?.new ?: markNew,
                 position = old?.position,
-                length = parseDuration(article.itunesArticleData?.duration) ?: old?.length,
+                length =
+                    if (old?.inPlaylist == true) old.length
+                    else parseDuration(article.itunesArticleData?.duration) ?: old?.length,
                 logo = article.image ?: article.itunesArticleData?.image ?: feed.logo,
                 title = article.title ?: "",
                 url = article.link ?: url,
