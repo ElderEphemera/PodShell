@@ -2,7 +2,6 @@ package com.elderephemera.podshell
 
 import android.app.NotificationManager
 import android.content.Context
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.work.*
@@ -10,6 +9,7 @@ import com.elderephemera.podshell.data.AppDataContainer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.toJavaDuration
 
 class RefreshWorker(private val context: Context, workerParams: WorkerParameters)
@@ -33,7 +33,10 @@ class RefreshWorker(private val context: Context, workerParams: WorkerParameters
             workInfosFuture.addListener(
                 {
                     val infos = workInfosFuture.get()
-                    if (infos.isEmpty() || infos.any { it.state == WorkInfo.State.FAILED }) {
+                    if (infos.isEmpty() || infos.any {
+                        it.state == WorkInfo.State.FAILED ||
+                        it.state == WorkInfo.State.CANCELLED
+                    }) {
                         scheduleRefresh(context, workManager)
                     }
                 },
@@ -76,58 +79,59 @@ class RefreshWorker(private val context: Context, workerParams: WorkerParameters
         ) = NotificationCompat.Builder(context, NEW_EP_CHANNEL_ID)
             .setContentTitle("New episodes: $newCount")
             .setSmallIcon(R.drawable.ic_notification)
+            .setNumber(newCount)
+            .setTimeoutAfter(5.minutes.inWholeMilliseconds)
             .setContentIntent(context.mainActivityPendingIntent(tab = 1))
             .build()
 
         suspend fun runRefresh(context: Context) = withContext(Dispatchers.IO) {
-            Log.i("refresh", "starting refresh")
-
-            val appContainer = AppDataContainer(context)
             val notificationManager =
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            context.ensureNotificationChannel(
-                channelId = REFRESH_CHANNEL_ID,
-                name = "Feed Refresh",
-                descriptionText = "Status of refreshing feeds",
-                importance = NotificationManager.IMPORTANCE_LOW,
-            )
-            val notificationBuilder = progressNotificationBuilder(context)
+            try {
+                val appContainer = AppDataContainer(context)
 
-            val feeds = appContainer.feedsRepository.getAllFeeds().first()
-            var completed = 0
-            feeds.map { feed ->
-                async {
-                    appContainer.feedsRepository.updateFeed(feed.id, feed.rss, markNew = true)
-                    notificationManager.notify(
-                        REFRESH_NOTIFICATION_ID,
-                        progressNotification(
-                            notificationBuilder,
-                            feedTitle = feed.title,
-                            total = feeds.size,
-                            completed = ++completed
+                context.ensureNotificationChannel(
+                    channelId = REFRESH_CHANNEL_ID,
+                    name = "Feed Refresh",
+                    descriptionText = "Status of refreshing feeds",
+                    importance = NotificationManager.IMPORTANCE_LOW,
+                )
+                val notificationBuilder = progressNotificationBuilder(context)
+
+                val feeds = appContainer.feedsRepository.getAllFeeds().first()
+                var completed = 0
+                feeds.map { feed ->
+                    async {
+                        appContainer.feedsRepository.updateFeed(feed.id, feed.rss, markNew = true)
+                        notificationManager.notify(
+                            REFRESH_NOTIFICATION_ID,
+                            progressNotification(
+                                notificationBuilder,
+                                feedTitle = feed.title,
+                                total = feeds.size,
+                                completed = ++completed
+                            )
                         )
+                    }
+                }.awaitAll()
+
+                val new = appContainer.episodesRepository.getAllNewEpisodes().first()
+                if (!new.isEmpty()) {
+                    context.ensureNotificationChannel(
+                        channelId = NEW_EP_CHANNEL_ID,
+                        name = "New Episodes",
+                        descriptionText = "New episode alerts",
+                        importance = NotificationManager.IMPORTANCE_DEFAULT,
+                    )
+                    notificationManager.notify(
+                        NEW_EP_NOTIFICATION_ID,
+                        createFinishedNotification(context, new.size)
                     )
                 }
-            }.awaitAll()
-
-            notificationManager.cancel(REFRESH_NOTIFICATION_ID)
-
-            val new = appContainer.episodesRepository.getAllNewEpisodes().first()
-            if (!new.isEmpty()) {
-                context.ensureNotificationChannel(
-                    channelId = NEW_EP_CHANNEL_ID,
-                    name = "New Episodes",
-                    descriptionText = "New episode alerts",
-                    importance = NotificationManager.IMPORTANCE_DEFAULT,
-                )
-                notificationManager.notify(
-                    NEW_EP_NOTIFICATION_ID,
-                    createFinishedNotification(context, new.size)
-                )
+            } finally {
+                notificationManager.cancel(REFRESH_NOTIFICATION_ID)
             }
-
-            Log.i("refresh", "refresh finished")
         }
     }
 
